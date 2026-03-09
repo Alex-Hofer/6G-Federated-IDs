@@ -17,7 +17,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Model
 
-- [ ] **MODL-01**: Define MLP model in PyTorch (3-layer feed-forward, ReLU, dropout, binary classification)
+- [x] **MODL-01**: Define MLP model in PyTorch (3-layer feed-forward, ReLU, dropout, binary classification)
 - [ ] **MODL-02**: Implement local PyTorch training loop with configurable hyperparameters
 - [ ] **MODL-03**: Implement model checkpointing to save the best-performing global model based on F1-score during training
 
@@ -90,7 +90,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-03 | Phase 1 | Complete |
 | DATA-04 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Complete |
-| MODL-01 | Phase 2 | Pending |
+| MODL-01 | Phase 2 | Complete |
 | MODL-02 | Phase 2 | Pending |
 | MODL-03 | Phase 2 | Pending |
 | FLRN-01 | Phase 3 | Pending |
