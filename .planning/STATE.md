@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: "Plan 04-02 complete, Phase 4 complete"
-last_updated: "2026-03-09T20:23:34Z"
+status: completed
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-09T20:26:45.770Z"
 last_activity: 2026-03-09 -- Plan 04-02 executed, TensorBoard SummaryWriter integrated into FL training loop
 progress:
   total_phases: 5
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 - Trend: stable
 
 *Updated after each plan completion*
+| Phase 04 P01 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,10 @@ Recent decisions affecting current work:
 - [03-02]: Convergence check uses mean F1 of first n vs last n rounds with adaptive n for short histories
 - [03-02]: Metrics JSON embeds full config snapshot for thesis reproducibility
 - [03-02]: CLI overrides (--num-clients, --num-rounds) mutate config dict before passing to run_federated_training
+- [04-01]: evaluate_detailed mirrors train.py:evaluate logic without modifying original (Phase 3 stability)
+- [04-01]: Total-based confusion matrix percentages (not row-based) per research Pitfall 2
+- [04-01]: Per-client local training uses num_rounds * local_epochs total epochs for fair comparison (Pitfall 3)
+- [04-01]: matplotlib.use('Agg') set before pyplot import for headless rendering
 - [04-02]: Conditional import with _HAS_TENSORBOARD flag for graceful degradation when tensorboard not installed
 - [04-02]: try/finally block wrapping entire FL loop and post-training to guarantee writer.close()
 - [04-02]: Global-only metrics (no per-client TB logging) per user decision
@@ -102,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T20:23:34Z
-Stopped at: Completed 04-02-PLAN.md (Phase 4 complete)
-Resume file: .planning/phases/04-evaluation-and-visualization/04-02-SUMMARY.md
+Last session: 2026-03-09T20:26:45.766Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None

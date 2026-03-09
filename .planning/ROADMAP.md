@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Project Foundation and Data Pipeline** - Scaffold the project and build a validated CICIDS2017 preprocessing pipeline that produces clean, normalized, partitioned DataLoaders
 - [ ] **Phase 2: Model Definition and Local Training** - Define the MLP model and validate local training on a single partition with correct loss and metrics
 - [ ] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients
-- [ ] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots
+- [x] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots (completed 2026-03-09)
 - [ ] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation
 
 ## Phase Details
@@ -76,7 +76,7 @@ Plans:
   2. Convergence plots (loss and F1 over FL rounds) are saved as PNG files showing training progression
   3. Per-client performance comparison is visualized, showing that all clients contribute meaningfully to the federated model
   4. TensorBoard logging captures training metrics for real-time monitoring during FL rounds
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md — Evaluation module: confusion matrix, classification report, convergence plots, per-client comparison, CLI entry point
@@ -105,5 +105,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
 | 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
 | 3. Federated Learning Infrastructure | 0/2 | Not started | - |
-| 4. Evaluation and Visualization | 0/2 | Not started | - |
+| 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
 | 5. Integration and Polish | 0/? | Not started | - |
