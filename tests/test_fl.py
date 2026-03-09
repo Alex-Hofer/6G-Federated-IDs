@@ -1,15 +1,26 @@
 """Unit tests for federated learning client and server components.
 
 Tests FederatedClient parameter handling, local training (fit), FedAvg
-weighted aggregation, and server-side evaluation.  These tests run in
-isolation (no Flower dependency) using synthetic data from conftest.py.
+weighted aggregation, server-side evaluation, orchestration loop,
+convergence checking, metrics persistence, and config banner.
 """
+
+import json
+import os
+import tempfile
 
 import numpy as np
 import torch
 
 from federated_ids.fl.client import FederatedClient
-from federated_ids.fl.server import fedavg_aggregate, server_evaluate
+from federated_ids.fl.server import (
+    check_convergence,
+    fedavg_aggregate,
+    print_config_banner,
+    run_federated_training,
+    save_fl_metrics,
+    server_evaluate,
+)
 
 
 class TestFederatedClientParameters:
@@ -168,3 +179,188 @@ class TestServerEvaluate:
         # All metric values should be numeric
         for key, value in metrics.items():
             assert isinstance(value, (int, float)), f"{key} is not numeric"
+
+
+class TestConvergenceCheck:
+    """Test check_convergence with crafted history lists."""
+
+    def test_convergence_check_pass(self):
+        """check_convergence returns True when later rounds have higher F1."""
+        history = [
+            {"f1": 0.50, "loss": 0.5, "accuracy": 0.6, "precision": 0.5, "recall": 0.5},
+            {"f1": 0.55, "loss": 0.4, "accuracy": 0.65, "precision": 0.55, "recall": 0.55},
+            {"f1": 0.60, "loss": 0.35, "accuracy": 0.7, "precision": 0.6, "recall": 0.6},
+            {"f1": 0.70, "loss": 0.3, "accuracy": 0.75, "precision": 0.7, "recall": 0.7},
+            {"f1": 0.80, "loss": 0.25, "accuracy": 0.8, "precision": 0.8, "recall": 0.8},
+            {"f1": 0.85, "loss": 0.2, "accuracy": 0.85, "precision": 0.85, "recall": 0.85},
+        ]
+        assert check_convergence(history) is True
+
+    def test_convergence_check_fail(self):
+        """check_convergence returns False when later rounds have lower F1."""
+        history = [
+            {"f1": 0.80, "loss": 0.2, "accuracy": 0.8, "precision": 0.8, "recall": 0.8},
+            {"f1": 0.75, "loss": 0.25, "accuracy": 0.75, "precision": 0.75, "recall": 0.75},
+            {"f1": 0.70, "loss": 0.3, "accuracy": 0.7, "precision": 0.7, "recall": 0.7},
+            {"f1": 0.60, "loss": 0.35, "accuracy": 0.65, "precision": 0.6, "recall": 0.6},
+            {"f1": 0.55, "loss": 0.4, "accuracy": 0.6, "precision": 0.55, "recall": 0.55},
+            {"f1": 0.50, "loss": 0.5, "accuracy": 0.55, "precision": 0.5, "recall": 0.5},
+        ]
+        assert check_convergence(history) is False
+
+
+class TestMetricsJsonOutput:
+    """Test save_fl_metrics JSON file creation."""
+
+    def test_metrics_json_output(self):
+        """save_fl_metrics creates valid JSON with 'config' and 'rounds' keys."""
+        history = [
+            {"f1": 0.70, "loss": 0.3, "accuracy": 0.75, "precision": 0.7, "recall": 0.7},
+            {"f1": 0.80, "loss": 0.2, "accuracy": 0.85, "precision": 0.8, "recall": 0.8},
+        ]
+        config = {
+            "federation": {"num_clients": 3, "num_rounds": 2, "fraction_fit": 1.0},
+            "training": {"learning_rate": 0.001, "local_epochs": 1, "batch_size": 64},
+            "model": {"hidden_layers": [128, 64, 32]},
+            "seed": 42,
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, "metrics", "fl_metrics.json")
+            save_fl_metrics(history, config, output_path)
+
+            assert os.path.isfile(output_path)
+
+            with open(output_path) as f:
+                data = json.load(f)
+
+            assert "config" in data
+            assert "rounds" in data
+            assert len(data["rounds"]) == 2
+            assert data["rounds"][0]["round"] == 1
+            assert data["rounds"][1]["round"] == 2
+
+
+class TestRoundMetricsKeys:
+    """Test that each round dict has all 5 required metric keys."""
+
+    def test_round_metrics_keys(
+        self, sample_model, fl_train_loaders, fl_test_loader, fl_criterion
+    ):
+        """Each round dict in history contains loss, accuracy, f1, precision, recall."""
+        device = torch.device("cpu")
+
+        # Run a minimal 2-round FL loop inline
+        from federated_ids.fl.client import FederatedClient
+        from federated_ids.fl.server import fedavg_aggregate, server_evaluate
+        from federated_ids.model.model import MLP
+
+        # Get initial parameters
+        global_params = [
+            val.cpu().detach().numpy().copy()
+            for val in sample_model.state_dict().values()
+        ]
+
+        history = []
+        num_rounds = 2
+        num_clients = min(2, len(fl_train_loaders))
+
+        for _round in range(num_rounds):
+            round_results = []
+            for cid in range(num_clients):
+                model = MLP(input_dim=10, hidden_layers=[32, 16], num_classes=2, dropout=0.1)
+                model.to(device)
+                optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+                client = FederatedClient(
+                    model, fl_train_loaders[cid], fl_criterion, optimizer, device
+                )
+                params, n_examples, _ = client.fit(
+                    global_params, {"local_epochs": 1}
+                )
+                round_results.append((params, n_examples))
+
+            global_params = fedavg_aggregate(round_results)
+
+            eval_model = MLP(input_dim=10, hidden_layers=[32, 16], num_classes=2, dropout=0.1)
+            eval_model.to(device)
+            metrics = server_evaluate(
+                global_params, eval_model, fl_test_loader, fl_criterion, device
+            )
+            history.append(metrics)
+
+        required_keys = {"loss", "accuracy", "f1", "precision", "recall"}
+        for i, metrics in enumerate(history):
+            assert required_keys == set(metrics.keys()), (
+                f"Round {i + 1} missing keys: {required_keys - set(metrics.keys())}"
+            )
+
+
+class TestConfigBanner:
+    """Test print_config_banner does not raise."""
+
+    def test_config_banner(self):
+        """print_config_banner with sample config does not raise an exception."""
+        config = {
+            "federation": {"num_clients": 3, "num_rounds": 20, "fraction_fit": 1.0},
+            "training": {"learning_rate": 0.001, "local_epochs": 1, "batch_size": 64},
+            "model": {"hidden_layers": [128, 64, 32], "dropout": 0.3},
+            "seed": 42,
+        }
+        # Should not raise
+        print_config_banner(config, device="cpu", num_features=25)
+
+
+class TestConfigDrivenRoundsClients:
+    """Test run_federated_training with config-driven rounds and clients."""
+
+    def test_config_driven_rounds_clients(self, tmp_path):
+        """run_federated_training with 2 rounds and 2 clients produces
+        exactly 2 metric dicts in history.
+        """
+        # Create synthetic cached tensors
+        rng = np.random.RandomState(42)
+        n_train, n_test, n_features = 200, 50, 10
+        X_train = rng.randn(n_train, n_features).astype(np.float32)
+        y_train = (rng.rand(n_train) < 0.3).astype(np.int64)
+        X_test = rng.randn(n_test, n_features).astype(np.float32)
+        y_test = (rng.rand(n_test) < 0.3).astype(np.int64)
+
+        processed_dir = str(tmp_path / "processed")
+        os.makedirs(processed_dir, exist_ok=True)
+        torch.save(torch.tensor(X_train), os.path.join(processed_dir, "X_train.pt"))
+        torch.save(torch.tensor(y_train), os.path.join(processed_dir, "y_train.pt"))
+        torch.save(torch.tensor(X_test), os.path.join(processed_dir, "X_test.pt"))
+        torch.save(torch.tensor(y_test), os.path.join(processed_dir, "y_test.pt"))
+
+        # Create class weights file
+        weights = {"0": 0.6, "1": 1.8}
+        with open(os.path.join(processed_dir, "class_weights.json"), "w") as f:
+            json.dump(weights, f)
+
+        output_dir = str(tmp_path / "outputs")
+
+        config = {
+            "data": {"processed_dir": processed_dir},
+            "model": {
+                "hidden_layers": [32, 16],
+                "dropout": 0.1,
+                "num_classes": 2,
+            },
+            "training": {
+                "learning_rate": 0.001,
+                "local_epochs": 1,
+                "batch_size": 32,
+                "weighted_loss": True,
+            },
+            "federation": {
+                "num_clients": 2,
+                "num_rounds": 2,
+                "fraction_fit": 1.0,
+            },
+            "seed": 42,
+            "output_dir": output_dir,
+            "log_level": "WARNING",
+        }
+
+        history = run_federated_training(config)
+
+        assert len(history) == 2, f"Expected 2 rounds, got {len(history)}"
