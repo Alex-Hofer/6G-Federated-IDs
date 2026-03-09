@@ -30,11 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Data is partitioned IID across a configurable number of clients (2-5) with stratified splits that preserve class ratios, verified by printing class distributions per partition
   4. A YAML configuration file controls all hyperparameters (learning rate, epochs, batch size, FL rounds, number of clients) and fixed random seeds ensure reproducible outputs
   5. The project has a working pyproject.toml with pinned dependencies, and `pip install -e .` succeeds
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Project scaffold, config system, seed utility, device detection
+- [ ] 01-02-PLAN.md — Data loading, cleaning, feature selection, normalization, class weights
+- [ ] 01-03-PLAN.md — IID partitioning, DataLoaders, pipeline entry point, README
 
 ### Phase 2: Model Definition and Local Training
 **Goal**: Users can train an MLP model on a single client's data partition and see it achieve reasonable DDoS detection metrics, confirming the model architecture and training loop work before federation
@@ -98,7 +99,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation and Data Pipeline | 0/? | Not started | - |
+| 1. Project Foundation and Data Pipeline | 0/3 | Not started | - |
 | 2. Model Definition and Local Training | 0/? | Not started | - |
 | 3. Federated Learning Infrastructure | 0/? | Not started | - |
 | 4. Evaluation and Visualization | 0/? | Not started | - |
