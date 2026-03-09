@@ -181,11 +181,14 @@ class TestCheckpointing:
         loader = _make_loader(X, y)
         device = torch.device("cpu")
         model = sample_model.to(device)
-        criterion = torch.nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        # Use class-weighted loss and higher LR so model learns minority class
+        weights = torch.tensor([0.6, 1.8], dtype=torch.float32)
+        criterion = torch.nn.CrossEntropyLoss(weight=weights)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
-        # Train one epoch to get non-trivial weights
-        train_one_epoch(model, loader, criterion, optimizer, device)
+        # Train several epochs so model learns to predict both classes
+        for _ in range(10):
+            train_one_epoch(model, loader, criterion, optimizer, device)
 
         # Evaluate to get metrics
         metrics = evaluate(model, loader, criterion, device)
