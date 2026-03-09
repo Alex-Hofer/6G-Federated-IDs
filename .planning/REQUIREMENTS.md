@@ -13,7 +13,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-02**: Select and engineer features (reduce 78+ raw features to 20-40 informative ones)
 - [x] **DATA-03**: Normalize features with StandardScaler fitted on training data only (no data leakage)
 - [x] **DATA-04**: Handle class imbalance via weighted cross-entropy loss for DDoS minority class
-- [ ] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
+- [x] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
 
 ### Model
 
@@ -89,7 +89,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 1 | Complete |
 | DATA-04 | Phase 1 | Complete |
-| DATA-05 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Complete |
 | MODL-01 | Phase 2 | Pending |
 | MODL-02 | Phase 2 | Pending |
 | MODL-03 | Phase 2 | Pending |
