@@ -33,6 +33,13 @@ import torch
 
 from federated_ids.model.train import evaluate
 
+try:
+    from torch.utils.tensorboard import SummaryWriter
+
+    _HAS_TENSORBOARD = True
+except ImportError:
+    _HAS_TENSORBOARD = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -379,67 +386,85 @@ def run_federated_training(
     os.makedirs(checkpoint_dir, exist_ok=True)
     checkpoint_path = os.path.join(checkpoint_dir, "global_model.pt")
 
-    for round_num in range(1, num_rounds + 1):
-        round_results = []
+    # --- TensorBoard setup ---
+    tb_dir = os.path.join(output_dir, "tensorboard")
+    writer = SummaryWriter(log_dir=tb_dir) if _HAS_TENSORBOARD else None
+    if writer is not None:
+        logger.info("TensorBoard logging enabled: %s", tb_dir)
 
-        for client_id in range(num_clients):
-            # Fresh model per client per round (Pitfall 6: avoid shared state)
-            client_model = MLP(input_dim, hidden_layers, num_classes, dropout).to(device)
-            # Fresh optimizer per client per round (Pitfall 2: reset optimizer)
-            client_optimizer = torch.optim.Adam(
-                client_model.parameters(), lr=learning_rate
+    try:
+        for round_num in range(1, num_rounds + 1):
+            round_results = []
+
+            for client_id in range(num_clients):
+                # Fresh model per client per round (Pitfall 6: avoid shared state)
+                client_model = MLP(input_dim, hidden_layers, num_classes, dropout).to(device)
+                # Fresh optimizer per client per round (Pitfall 2: reset optimizer)
+                client_optimizer = torch.optim.Adam(
+                    client_model.parameters(), lr=learning_rate
+                )
+                client = FederatedClient(
+                    client_model, client_loaders[client_id], criterion, client_optimizer, device
+                )
+                params, n_examples, _ = client.fit(
+                    global_params, {"local_epochs": local_epochs}
+                )
+                round_results.append((params, n_examples))
+
+            # Aggregate
+            global_params = fedavg_aggregate(round_results)
+
+            # Evaluate
+            metrics = server_evaluate(
+                global_params, eval_model, test_loader, criterion, device
             )
-            client = FederatedClient(
-                client_model, client_loaders[client_id], criterion, client_optimizer, device
-            )
-            params, n_examples, _ = client.fit(
-                global_params, {"local_epochs": local_epochs}
-            )
-            round_results.append((params, n_examples))
 
-        # Aggregate
-        global_params = fedavg_aggregate(round_results)
-
-        # Evaluate
-        metrics = server_evaluate(
-            global_params, eval_model, test_loader, criterion, device
-        )
-
-        # One-line per-round log
-        logger.info(
-            "Round %2d/%d -- loss: %.3f, acc: %.2f, F1: %.2f, prec: %.2f, rec: %.2f",
-            round_num,
-            num_rounds,
-            metrics["loss"],
-            metrics["accuracy"],
-            metrics["f1"],
-            metrics["precision"],
-            metrics["recall"],
-        )
-
-        # Checkpoint on F1 improvement
-        if metrics["f1"] > best_f1:
-            best_f1 = metrics["f1"]
-            # Load global params into eval model and save state_dict
-            keys = list(eval_model.state_dict().keys())
-            state_dict = OrderedDict(
-                {k: torch.tensor(v) for k, v in zip(keys, global_params)}
-            )
-            torch.save(state_dict, checkpoint_path)
+            # One-line per-round log
             logger.info(
-                "Saved global model (round %d, F1=%.2f)", round_num, best_f1
+                "Round %2d/%d -- loss: %.3f, acc: %.2f, F1: %.2f, prec: %.2f, rec: %.2f",
+                round_num,
+                num_rounds,
+                metrics["loss"],
+                metrics["accuracy"],
+                metrics["f1"],
+                metrics["precision"],
+                metrics["recall"],
             )
 
-        history.append(metrics)
+            # TensorBoard logging
+            if writer is not None:
+                writer.add_scalar("Global/loss", metrics["loss"], round_num)
+                writer.add_scalar("Global/accuracy", metrics["accuracy"], round_num)
+                writer.add_scalar("Global/f1", metrics["f1"], round_num)
+                writer.add_scalar("Global/precision", metrics["precision"], round_num)
+                writer.add_scalar("Global/recall", metrics["recall"], round_num)
 
-    # --- Post-training ---
-    _print_fl_summary_table(history)
-    check_convergence(history)
+            # Checkpoint on F1 improvement
+            if metrics["f1"] > best_f1:
+                best_f1 = metrics["f1"]
+                # Load global params into eval model and save state_dict
+                keys = list(eval_model.state_dict().keys())
+                state_dict = OrderedDict(
+                    {k: torch.tensor(v) for k, v in zip(keys, global_params)}
+                )
+                torch.save(state_dict, checkpoint_path)
+                logger.info(
+                    "Saved global model (round %d, F1=%.2f)", round_num, best_f1
+                )
 
-    # Store device in config for metrics persistence
-    config["_device"] = str(device)
-    metrics_path = os.path.join(output_dir, "metrics", "fl_metrics.json")
-    save_fl_metrics(history, config, metrics_path)
-    logger.info("FL metrics saved to %s", metrics_path)
+            history.append(metrics)
+
+        # --- Post-training ---
+        _print_fl_summary_table(history)
+        check_convergence(history)
+
+        # Store device in config for metrics persistence
+        config["_device"] = str(device)
+        metrics_path = os.path.join(output_dir, "metrics", "fl_metrics.json")
+        save_fl_metrics(history, config, metrics_path)
+        logger.info("FL metrics saved to %s", metrics_path)
+    finally:
+        if writer is not None:
+            writer.close()
 
     return history
