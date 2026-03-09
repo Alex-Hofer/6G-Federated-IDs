@@ -2,12 +2,14 @@
 
 Tests FederatedClient parameter handling, local training (fit), FedAvg
 weighted aggregation, server-side evaluation, orchestration loop,
-convergence checking, metrics persistence, and config banner.
+convergence checking, metrics persistence, config banner, and
+TensorBoard metric logging integration.
 """
 
 import json
 import os
 import tempfile
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import torch
@@ -389,3 +391,166 @@ class TestCLIOverrides:
             call_config = mock_run.call_args[0][0]
             assert call_config["federation"]["num_clients"] == 5
             assert call_config["federation"]["num_rounds"] == 3
+
+
+class TestTensorBoardLogging:
+    """Test TensorBoard SummaryWriter integration in FL training loop."""
+
+    def test_tensorboard_scalars_logged_per_round(self, tmp_path):
+        """run_federated_training logs 5 scalars per round via SummaryWriter.
+
+        Uses 2 rounds, expects 10 total add_scalar calls (5 per round)
+        with correct tag names, and close() called once.
+        """
+        # Create synthetic cached tensors
+        rng = np.random.RandomState(42)
+        n_train, n_test, n_features = 200, 50, 10
+        X_train = rng.randn(n_train, n_features).astype(np.float32)
+        y_train = (rng.rand(n_train) < 0.3).astype(np.int64)
+        X_test = rng.randn(n_test, n_features).astype(np.float32)
+        y_test = (rng.rand(n_test) < 0.3).astype(np.int64)
+
+        processed_dir = str(tmp_path / "processed")
+        os.makedirs(processed_dir, exist_ok=True)
+        torch.save(torch.tensor(X_train), os.path.join(processed_dir, "X_train.pt"))
+        torch.save(torch.tensor(y_train), os.path.join(processed_dir, "y_train.pt"))
+        torch.save(torch.tensor(X_test), os.path.join(processed_dir, "X_test.pt"))
+        torch.save(torch.tensor(y_test), os.path.join(processed_dir, "y_test.pt"))
+
+        output_dir = str(tmp_path / "outputs")
+        num_rounds = 2
+
+        config = {
+            "data": {"processed_dir": processed_dir},
+            "model": {
+                "hidden_layers": [32, 16],
+                "dropout": 0.1,
+                "num_classes": 2,
+            },
+            "training": {
+                "learning_rate": 0.001,
+                "local_epochs": 1,
+                "batch_size": 32,
+                "weighted_loss": False,
+            },
+            "federation": {
+                "num_clients": 2,
+                "num_rounds": num_rounds,
+                "fraction_fit": 1.0,
+            },
+            "seed": 42,
+            "output_dir": output_dir,
+            "log_level": "WARNING",
+        }
+
+        mock_writer = MagicMock()
+
+        with patch("federated_ids.fl.server._HAS_TENSORBOARD", True), \
+             patch("federated_ids.fl.server.SummaryWriter", return_value=mock_writer):
+            history = run_federated_training(config)
+
+        # 5 scalars per round * 2 rounds = 10 calls
+        assert mock_writer.add_scalar.call_count == 5 * num_rounds
+
+        # Verify correct tag names were used
+        expected_tags = {
+            "Global/loss", "Global/accuracy", "Global/f1",
+            "Global/precision", "Global/recall",
+        }
+        actual_tags = {call.args[0] for call in mock_writer.add_scalar.call_args_list}
+        assert actual_tags == expected_tags, (
+            f"Expected tags {expected_tags}, got {actual_tags}"
+        )
+
+        # Verify close() was called exactly once
+        mock_writer.close.assert_called_once()
+
+        # Verify correct round numbers were used as step
+        round_nums = {call.args[2] for call in mock_writer.add_scalar.call_args_list}
+        assert round_nums == {1, 2}
+
+    def test_tensorboard_log_dir_created(self, tmp_path):
+        """SummaryWriter is initialized with log_dir under output_dir/tensorboard."""
+        rng = np.random.RandomState(42)
+        n_train, n_test, n_features = 200, 50, 10
+        X_train = rng.randn(n_train, n_features).astype(np.float32)
+        y_train = (rng.rand(n_train) < 0.3).astype(np.int64)
+        X_test = rng.randn(n_test, n_features).astype(np.float32)
+        y_test = (rng.rand(n_test) < 0.3).astype(np.int64)
+
+        processed_dir = str(tmp_path / "processed")
+        os.makedirs(processed_dir, exist_ok=True)
+        torch.save(torch.tensor(X_train), os.path.join(processed_dir, "X_train.pt"))
+        torch.save(torch.tensor(y_train), os.path.join(processed_dir, "y_train.pt"))
+        torch.save(torch.tensor(X_test), os.path.join(processed_dir, "X_test.pt"))
+        torch.save(torch.tensor(y_test), os.path.join(processed_dir, "y_test.pt"))
+
+        output_dir = str(tmp_path / "outputs")
+
+        config = {
+            "data": {"processed_dir": processed_dir},
+            "model": {"hidden_layers": [32, 16], "dropout": 0.1, "num_classes": 2},
+            "training": {
+                "learning_rate": 0.001, "local_epochs": 1,
+                "batch_size": 32, "weighted_loss": False,
+            },
+            "federation": {"num_clients": 2, "num_rounds": 1, "fraction_fit": 1.0},
+            "seed": 42,
+            "output_dir": output_dir,
+            "log_level": "WARNING",
+        }
+
+        mock_writer = MagicMock()
+        mock_sw_class = MagicMock(return_value=mock_writer)
+
+        with patch("federated_ids.fl.server._HAS_TENSORBOARD", True), \
+             patch("federated_ids.fl.server.SummaryWriter", mock_sw_class):
+            run_federated_training(config)
+
+        # SummaryWriter should have been called with correct log_dir
+        expected_tb_dir = os.path.join(output_dir, "tensorboard")
+        mock_sw_class.assert_called_once_with(log_dir=expected_tb_dir)
+
+
+class TestTensorBoardFallback:
+    """Test graceful degradation when TensorBoard is not installed."""
+
+    def test_no_tensorboard_no_error(self, tmp_path):
+        """run_federated_training completes without error when _HAS_TENSORBOARD is False."""
+        rng = np.random.RandomState(42)
+        n_train, n_test, n_features = 200, 50, 10
+        X_train = rng.randn(n_train, n_features).astype(np.float32)
+        y_train = (rng.rand(n_train) < 0.3).astype(np.int64)
+        X_test = rng.randn(n_test, n_features).astype(np.float32)
+        y_test = (rng.rand(n_test) < 0.3).astype(np.int64)
+
+        processed_dir = str(tmp_path / "processed")
+        os.makedirs(processed_dir, exist_ok=True)
+        torch.save(torch.tensor(X_train), os.path.join(processed_dir, "X_train.pt"))
+        torch.save(torch.tensor(y_train), os.path.join(processed_dir, "y_train.pt"))
+        torch.save(torch.tensor(X_test), os.path.join(processed_dir, "X_test.pt"))
+        torch.save(torch.tensor(y_test), os.path.join(processed_dir, "y_test.pt"))
+
+        output_dir = str(tmp_path / "outputs")
+
+        config = {
+            "data": {"processed_dir": processed_dir},
+            "model": {"hidden_layers": [32, 16], "dropout": 0.1, "num_classes": 2},
+            "training": {
+                "learning_rate": 0.001, "local_epochs": 1,
+                "batch_size": 32, "weighted_loss": False,
+            },
+            "federation": {"num_clients": 2, "num_rounds": 2, "fraction_fit": 1.0},
+            "seed": 42,
+            "output_dir": output_dir,
+            "log_level": "WARNING",
+        }
+
+        with patch("federated_ids.fl.server._HAS_TENSORBOARD", False):
+            history = run_federated_training(config)
+
+        # Should complete normally with 2 rounds of metrics
+        assert len(history) == 2
+        for metrics in history:
+            assert "loss" in metrics
+            assert "f1" in metrics
