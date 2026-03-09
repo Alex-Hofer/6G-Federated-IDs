@@ -1,12 +1,12 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "federated-ids-6g"
 version = "0.1.0"
 description = "Privacy-preserving Federated Learning IDS for 6G Edge Networks"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11"
 dependencies = [
     "torch>=2.4.0",
     "pandas>=2.2.0",
