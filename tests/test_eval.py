@@ -125,3 +125,12 @@ class TestClassificationReport:
         assert isinstance(report, str)
         assert "BENIGN" in report
         assert "DDoS" in report
+
+
+class TestEvalCLI:
+    """Test that the CLI entry point is importable and callable."""
+
+    def test_main_is_importable(self):
+        from federated_ids.eval.__main__ import main
+
+        assert callable(main)
