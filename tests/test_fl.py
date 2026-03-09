@@ -364,3 +364,28 @@ class TestConfigDrivenRoundsClients:
         history = run_federated_training(config)
 
         assert len(history) == 2, f"Expected 2 rounds, got {len(history)}"
+
+
+class TestCLIOverrides:
+    """Test CLI entry point with programmatic overrides."""
+
+    def test_cli_overrides(self):
+        """main() with num_clients=5 and num_rounds=3 overrides config values."""
+        from unittest.mock import patch
+
+        from federated_ids.fl.__main__ import main
+
+        with patch(
+            "federated_ids.fl.__main__.run_federated_training"
+        ) as mock_run:
+            mock_run.return_value = []
+            main(
+                config_path="config/default.yaml",
+                num_clients=5,
+                num_rounds=3,
+            )
+
+            mock_run.assert_called_once()
+            call_config = mock_run.call_args[0][0]
+            assert call_config["federation"]["num_clients"] == 5
+            assert call_config["federation"]["num_rounds"] == 3
