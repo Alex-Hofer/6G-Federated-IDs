@@ -23,8 +23,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Federated Learning
 
-- [ ] **FLRN-01**: Implement Flower NumPyClient wrapping local PyTorch training
-- [ ] **FLRN-02**: Implement Flower server with FedAvg aggregation strategy
+- [x] **FLRN-01**: Implement Flower NumPyClient wrapping local PyTorch training
+- [x] **FLRN-02**: Implement Flower server with FedAvg aggregation strategy
 - [ ] **FLRN-03**: Support configurable number of FL rounds and participating clients
 
 ### Evaluation & Visualization
@@ -93,8 +93,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MODL-01 | Phase 2 | Complete |
 | MODL-02 | Phase 2 | Complete |
 | MODL-03 | Phase 2 | Complete |
-| FLRN-01 | Phase 3 | Pending |
-| FLRN-02 | Phase 3 | Pending |
+| FLRN-01 | Phase 3 | Complete |
+| FLRN-02 | Phase 3 | Complete |
 | FLRN-03 | Phase 3 | Pending |
 | EVAL-01 | Phase 3 | Pending |
 | EVAL-02 | Phase 4 | Pending |
