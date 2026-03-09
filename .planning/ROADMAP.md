@@ -34,8 +34,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Project scaffold, config system, seed utility, device detection
-- [ ] 01-02-PLAN.md — Data loading, cleaning, feature selection, normalization, class weights
-- [ ] 01-03-PLAN.md — IID partitioning, DataLoaders, pipeline entry point, README
+- [x] 01-02-PLAN.md — Data loading, cleaning, feature selection, normalization, class weights
+- [x] 01-03-PLAN.md — IID partitioning, DataLoaders, pipeline entry point, README
 
 ### Phase 2: Model Definition and Local Training
 **Goal**: Users can train an MLP model on a single client's data partition and see it achieve reasonable DDoS detection metrics, confirming the model architecture and training loop work before federation
@@ -49,8 +49,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — MLP model definition (nn.Module) with configurable architecture and unit tests
-- [ ] 02-02-PLAN.md — Training loop, evaluation, checkpointing, standalone entry point, and tests
+- [x] 02-01-PLAN.md — MLP model definition (nn.Module) with configurable architecture and unit tests
+- [x] 02-02-PLAN.md — Training loop, evaluation, checkpointing, standalone entry point, and tests
 
 ### Phase 3: Federated Learning Infrastructure
 **Goal**: Users can start a Flower server and multiple clients that complete federated training rounds, with model weights aggregated via FedAvg and per-round metrics logged
@@ -100,8 +100,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation and Data Pipeline | 1/3 | In progress | - |
-| 2. Model Definition and Local Training | 0/2 | Not started | - |
+| 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
+| 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
 | 3. Federated Learning Infrastructure | 0/? | Not started | - |
 | 4. Evaluation and Visualization | 0/? | Not started | - |
 | 5. Integration and Polish | 0/? | Not started | - |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-09T16:09:00Z"
-last_activity: 2026-03-09 -- Plan 02-01 executed, MLP model defined
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-09T16:15:48Z"
+last_activity: 2026-03-09 -- Plan 02-02 executed, local training loop implemented
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Detect DDoS attacks across a federated network of edge nodes without any client ever sharing its raw network traffic data.
-**Current focus:** Phase 2: Model Definition and Local Training
+**Current focus:** Phase 2 complete. Ready for Phase 3: Federated Learning Infrastructure
 
 ## Current Position
 
-Phase: 2 of 5 (Model Definition and Local Training)
-Plan: 1 of 2 in current phase (complete)
-Status: Plan 02-01 complete -- ready for Plan 02-02
-Last activity: 2026-03-09 -- Plan 02-01 executed, MLP model defined
+Phase: 2 of 5 (Model Definition and Local Training) -- COMPLETE
+Plan: 2 of 2 in current phase (complete)
+Status: Phase 2 complete -- ready for Phase 3
+Last activity: 2026-03-09 -- Plan 02-02 executed, local training loop implemented
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 6min
+- Total plans completed: 5
+- Average duration: 5min
 - Total execution time: 0.4 hours
 
 **By Phase:**
@@ -44,10 +44,10 @@ Progress: [████████░░] 80%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 3 | 20min | 7min |
-| 2 | 1 | 2min | 2min |
+| 2 | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (12min), 01-02 (5min), 01-03 (3min), 02-01 (2min)
+- Last 5 plans: 01-02 (5min), 01-03 (3min), 02-01 (2min), 02-02 (4min)
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -75,6 +75,10 @@ Recent decisions affecting current work:
 - [01-03]: Pipeline entry point supports both CLI (argparse) and programmatic (config_path parameter) invocation
 - [02-01]: Raw logits output (no softmax) to avoid double-softmax bug with CrossEntropyLoss
 - [02-01]: Dynamic layer construction via nn.Sequential from hidden_layers list
+- [02-02]: Class-weighted loss loaded from class_weights.json with explicit device placement
+- [02-02]: Best-model checkpoint saved only on F1 improvement (not loss) for better DDoS detection quality
+- [02-02]: standalone_epochs and val_split as optional config keys (not in _REQUIRED_NESTED) to avoid breaking FL configs
+- [02-02]: Auto-run data pipeline if cached tensors missing for zero-config standalone training
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T16:09:00Z
-Stopped at: Completed 02-01-PLAN.md
-Resume file: .planning/phases/02-model-definition-and-local-training/02-01-SUMMARY.md
+Last session: 2026-03-09T16:15:48Z
+Stopped at: Completed 02-02-PLAN.md
+Resume file: .planning/phases/02-model-definition-and-local-training/02-02-SUMMARY.md
