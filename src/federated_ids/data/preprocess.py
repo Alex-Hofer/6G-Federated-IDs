@@ -15,6 +15,10 @@ The preprocessing pipeline:
 7. Compute class weights for balanced loss
 8. Save artifacts (scaler, feature list, class weights) to processed directory
 
+The ``main()`` function chains all three pipeline stages (load -> preprocess ->
+partition) and supports caching preprocessed tensors to skip recomputation on
+subsequent runs.
+
 Example:
     >>> from federated_ids.data.loader import load_cicids2017
     >>> from federated_ids.data.preprocess import preprocess
@@ -25,6 +29,7 @@ Example:
     (180000, 25) float32
 """
 
+import argparse
 import json
 import logging
 import os
@@ -32,11 +37,16 @@ import os
 import joblib
 import numpy as np
 import pandas as pd
+import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
-from federated_ids.data.loader import IDENTIFIER_COLS
+from federated_ids.config import load_config
+from federated_ids.data.loader import IDENTIFIER_COLS, load_cicids2017
+from federated_ids.data.partition import create_dataloaders, partition_iid
+from federated_ids.device import get_device
+from federated_ids.seed import set_global_seed
 
 logger = logging.getLogger(__name__)
 
@@ -403,3 +413,134 @@ def preprocess(df: pd.DataFrame, config: dict) -> dict:
         "class_weights": class_weights,
         "feature_report": feature_report,
     }
+
+
+# ---------------------------------------------------------------------------
+# Cache file names for preprocessed tensor persistence
+# ---------------------------------------------------------------------------
+_CACHE_FILES = ("X_train.pt", "X_test.pt", "y_train.pt", "y_test.pt")
+
+
+def _cache_exists(processed_dir: str) -> bool:
+    """Check whether all cached tensor files exist in the processed directory.
+
+    Args:
+        processed_dir: Path to the directory containing cached tensors.
+
+    Returns:
+        True if all four tensor files exist, False otherwise.
+    """
+    return all(
+        os.path.isfile(os.path.join(processed_dir, f)) for f in _CACHE_FILES
+    )
+
+
+def main(config_path: str | None = None) -> tuple[list, "DataLoader"]:
+    """Run the complete data pipeline: load, preprocess, partition, and wrap in DataLoaders.
+
+    Chains all three stages of the data pipeline. Supports caching: if
+    preprocessed tensors already exist in ``processed_dir``, they are loaded
+    directly to skip the expensive load + preprocess steps.
+
+    Args:
+        config_path: Path to YAML config file. Defaults to
+            ``config/default.yaml`` if not provided and no CLI argument given.
+
+    Returns:
+        A tuple of:
+        - List of client DataLoaders (one per federated client)
+        - Global test DataLoader
+    """
+    # Parse CLI args if no config_path provided
+    if config_path is None:
+        parser = argparse.ArgumentParser(
+            description="Run the CICIDS2017 preprocessing and partitioning pipeline."
+        )
+        parser.add_argument(
+            "--config",
+            default="config/default.yaml",
+            help="Path to YAML configuration file (default: config/default.yaml)",
+        )
+        args = parser.parse_args()
+        config_path = args.config
+
+    # Load config and set up reproducibility
+    config = load_config(config_path)
+    seed = config.get("seed", 42)
+    set_global_seed(seed)
+
+    # Set up logging
+    log_level = config.get("log_level", "INFO")
+    logging.basicConfig(
+        level=getattr(logging, log_level),
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+
+    data_config = config["data"]
+    processed_dir = data_config.get("processed_dir", "./data/processed")
+    num_clients = config["federation"]["num_clients"]
+    batch_size = config["training"]["batch_size"]
+
+    # Check for cached preprocessed data
+    if _cache_exists(processed_dir):
+        logger.info("Loading cached data from %s", processed_dir)
+        X_train = torch.load(
+            os.path.join(processed_dir, "X_train.pt"), weights_only=True
+        ).numpy()
+        X_test = torch.load(
+            os.path.join(processed_dir, "X_test.pt"), weights_only=True
+        ).numpy()
+        y_train = torch.load(
+            os.path.join(processed_dir, "y_train.pt"), weights_only=True
+        ).numpy()
+        y_test = torch.load(
+            os.path.join(processed_dir, "y_test.pt"), weights_only=True
+        ).numpy()
+    else:
+        # Stage 1: Load raw CSV data
+        raw_dir = data_config.get("raw_dir", "./data/raw")
+        files = data_config.get("files", [])
+        logger.info("Stage 1: Loading CICIDS2017 from %s", raw_dir)
+        df = load_cicids2017(raw_dir, files)
+
+        # Stage 2: Preprocess (feature selection, split, scale, class weights)
+        logger.info("Stage 2: Preprocessing...")
+        result = preprocess(df, config)
+        X_train = result["X_train"]
+        X_test = result["X_test"]
+        y_train = result["y_train"]
+        y_test = result["y_test"]
+
+        # Save processed tensors as cache for subsequent runs
+        os.makedirs(processed_dir, exist_ok=True)
+        torch.save(torch.tensor(X_train), os.path.join(processed_dir, "X_train.pt"))
+        torch.save(torch.tensor(X_test), os.path.join(processed_dir, "X_test.pt"))
+        torch.save(torch.tensor(y_train), os.path.join(processed_dir, "y_train.pt"))
+        torch.save(torch.tensor(y_test), os.path.join(processed_dir, "y_test.pt"))
+        logger.info("Saved cached tensors to %s", processed_dir)
+
+    # Stage 3: IID partitioning
+    logger.info("Stage 3: IID partitioning across %d clients", num_clients)
+    partitions = partition_iid(X_train, y_train, num_clients=num_clients, seed=seed)
+
+    # Create DataLoaders
+    client_loaders, test_loader = create_dataloaders(
+        partitions, X_test, y_test, batch_size=batch_size
+    )
+
+    # Summary
+    device = get_device()
+    logger.info("--- Pipeline Summary ---")
+    logger.info("  Clients: %d", num_clients)
+    for i, loader in enumerate(client_loaders):
+        logger.info("  Client %d: %d samples", i, len(loader.dataset))
+    logger.info("  Test set: %d samples", len(test_loader.dataset))
+    logger.info("  Batch size: %d", batch_size)
+    logger.info("  Device: %s", device)
+    logger.info("--- End Pipeline Summary ---")
+
+    return client_loaders, test_loader
+
+
+if __name__ == "__main__":
+    main()
