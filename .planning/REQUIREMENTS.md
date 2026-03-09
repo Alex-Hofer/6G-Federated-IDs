@@ -36,8 +36,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
-- [ ] **INFR-02**: Reproducibility via fixed seeds, pyproject.toml, and documented hyperparameters
+- [x] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
+- [x] **INFR-02**: Reproducibility via fixed seeds, pyproject.toml, and documented hyperparameters
 
 ## v2 Requirements
 
@@ -100,8 +100,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVAL-02 | Phase 4 | Pending |
 | EVAL-03 | Phase 4 | Pending |
 | EVAL-04 | Phase 4 | Pending |
-| INFR-01 | Phase 1 | Pending |
-| INFR-02 | Phase 1 | Pending |
+| INFR-01 | Phase 1 | Complete |
+| INFR-02 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 17 total
@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after roadmap creation*
+*Last updated: 2026-03-09 after 01-01 execution*
