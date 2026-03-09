@@ -1,0 +1,36 @@
+# Data directories (large CSV files, processed artifacts)
+# Leading slash anchors to project root only (avoids ignoring src/*/data/)
+/data/
+/outputs/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Build and distribution
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Model and data artifacts
+*.pkl
+*.pt
+*.pth
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

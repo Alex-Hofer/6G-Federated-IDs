@@ -1,0 +1,106 @@
+# ============================================================
+# Federated IDS Configuration
+# ============================================================
+# This file controls all hyperparameters for the federated
+# learning intrusion detection system. Each parameter includes
+# a brief explanation suitable for thesis documentation.
+#
+# Environment variables: Use ${VAR_NAME:-default} syntax.
+# Example: ${DATA_DIR:-./data} uses $DATA_DIR if set, else ./data
+# ============================================================
+
+# --- Data Pipeline ---
+# Controls CICIDS2017 loading, cleaning, feature selection,
+# and train/test splitting.
+data:
+  # Path to directory containing raw CICIDS2017 CSV files.
+  # Users must manually place downloaded CSVs here.
+  raw_dir: "${DATA_DIR:-./data}/raw"
+
+  # Path to directory for preprocessed pipeline output
+  # (scaled tensors, fitted scaler, feature list, class weights).
+  processed_dir: "${DATA_DIR:-./data}/processed"
+
+  # CSV files to load from raw_dir. Only Friday DDoS file is used
+  # for binary DDoS classification (BENIGN vs DDoS).
+  files:
+    - "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv"
+
+  # Fraction of data held out as a global test set BEFORE client
+  # partitioning. This test set is never seen during training.
+  test_size: 0.2
+
+  # Target number of informative features after hybrid selection
+  # (domain shortlist + statistical filtering). Actual count depends
+  # on the data; this value is informational only.
+  target_features: 30
+
+  # Pearson correlation threshold: drop one feature from each pair
+  # with |r| above this value, keeping the higher-variance feature.
+  correlation_threshold: 0.95
+
+  # Variance threshold: drop features with variance below this value
+  # to remove near-constant columns that carry no information.
+  variance_threshold: 1.0e-10
+
+# --- Model Architecture ---
+# MLP (Multi-Layer Perceptron) for binary DDoS detection.
+model:
+  # Hidden layer sizes. Three layers with decreasing width provide
+  # a gradual compression of the feature space.
+  hidden_layers: [128, 64, 32]
+
+  # Dropout probability applied after each hidden layer for
+  # regularization, reducing overfitting on training data.
+  dropout: 0.3
+
+  # Number of output classes. Binary classification:
+  # 0 = BENIGN, 1 = DDoS.
+  num_classes: 2
+
+# --- Training ---
+# Hyperparameters for local model training on each client.
+training:
+  # Learning rate for the Adam optimizer. Standard starting point
+  # for MLP on tabular data.
+  learning_rate: 0.001
+
+  # Number of local training epochs per federated learning round.
+  # Each client trains this many epochs before sending weights.
+  local_epochs: 1
+
+  # Mini-batch size for the DataLoader. Balances GPU memory usage
+  # and gradient noise.
+  batch_size: 64
+
+  # Whether to use class-weighted cross-entropy loss to handle
+  # class imbalance between BENIGN and DDoS samples.
+  weighted_loss: true
+
+# --- Federation ---
+# Flower federated learning configuration.
+federation:
+  # Number of simulated federated clients. Each client receives
+  # an IID partition of the global training data.
+  num_clients: 3
+
+  # Number of federated learning rounds. The global model is
+  # updated this many times via FedAvg aggregation.
+  num_rounds: 20
+
+  # Fraction of clients participating in each round.
+  # 1.0 means all clients participate every round.
+  fraction_fit: 1.0
+
+# --- Infrastructure ---
+# Global random seed for reproducibility across all RNG sources
+# (random, numpy, torch, torch.cuda).
+seed: 42
+
+# Directory for output artifacts (plots, model checkpoints,
+# training metrics, evaluation reports).
+output_dir: "${OUTPUT_DIR:-./outputs}"
+
+# Logging level: DEBUG, INFO, WARNING, ERROR.
+# DEBUG shows per-batch metrics; INFO shows per-epoch summaries.
+log_level: "INFO"
