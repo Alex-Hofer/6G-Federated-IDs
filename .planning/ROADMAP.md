@@ -46,10 +46,11 @@ Plans:
   2. Running local training on one client's data partition produces per-epoch metrics (loss, accuracy, F1) printed to console, with F1 above 0.80 on DDoS detection within 5 epochs
   3. Class-weighted cross-entropy loss is applied so that the model does not simply predict "benign" for everything (attack-class recall is above 0.70)
   4. The best model checkpoint is saved based on F1-score and can be reloaded for evaluation
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — MLP model definition (nn.Module) with configurable architecture and unit tests
+- [ ] 02-02-PLAN.md — Training loop, evaluation, checkpointing, standalone entry point, and tests
 
 ### Phase 3: Federated Learning Infrastructure
 **Goal**: Users can start a Flower server and multiple clients that complete federated training rounds, with model weights aggregated via FedAvg and per-round metrics logged
@@ -100,7 +101,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Foundation and Data Pipeline | 1/3 | In progress | - |
-| 2. Model Definition and Local Training | 0/? | Not started | - |
+| 2. Model Definition and Local Training | 0/2 | Not started | - |
 | 3. Federated Learning Infrastructure | 0/? | Not started | - |
 | 4. Evaluation and Visualization | 0/? | Not started | - |
 | 5. Integration and Polish | 0/? | Not started | - |
