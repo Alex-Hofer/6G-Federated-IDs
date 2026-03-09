@@ -25,11 +25,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **FLRN-01**: Implement Flower NumPyClient wrapping local PyTorch training
 - [x] **FLRN-02**: Implement Flower server with FedAvg aggregation strategy
-- [ ] **FLRN-03**: Support configurable number of FL rounds and participating clients
+- [x] **FLRN-03**: Support configurable number of FL rounds and participating clients
 
 ### Evaluation & Visualization
 
-- [ ] **EVAL-01**: Log per-round metrics (accuracy, precision, recall, F1) to console
+- [x] **EVAL-01**: Log per-round metrics (accuracy, precision, recall, F1) to console
 - [ ] **EVAL-02**: Generate confusion matrix and classification report on held-out test set
 - [ ] **EVAL-03**: Save convergence plots (loss and accuracy over FL rounds) as PNG
 - [ ] **EVAL-04**: Log training metrics to TensorBoard for real-time monitoring
@@ -95,8 +95,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MODL-03 | Phase 2 | Complete |
 | FLRN-01 | Phase 3 | Complete |
 | FLRN-02 | Phase 3 | Complete |
-| FLRN-03 | Phase 3 | Pending |
-| EVAL-01 | Phase 3 | Pending |
+| FLRN-03 | Phase 3 | Complete |
+| EVAL-01 | Phase 3 | Complete |
 | EVAL-02 | Phase 4 | Pending |
 | EVAL-03 | Phase 4 | Pending |
 | EVAL-04 | Phase 4 | Pending |

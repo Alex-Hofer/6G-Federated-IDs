@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-09T19:29:20Z"
-last_activity: 2026-03-09 -- Plan 03-01 executed, FL client and FedAvg aggregation implemented
+stopped_at: Completed 03-02-PLAN.md (Phase 3 complete)
+last_updated: "2026-03-09T19:37:33Z"
+last_activity: 2026-03-09 -- Plan 03-02 executed, FL orchestration loop, CLI, convergence check implemented
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Detect DDoS attacks across a federated network of edge nodes without any client ever sharing its raw network traffic data.
-**Current focus:** Phase 3 in progress: Federated Learning Infrastructure
+**Current focus:** Phase 3 complete. Ready for Phase 4: Evaluation Framework
 
 ## Current Position
 
-Phase: 3 of 5 (Federated Learning Infrastructure)
-Plan: 1 of 2 in current phase (03-01 complete, 03-02 remaining)
-Status: Phase 3 in progress
-Last activity: 2026-03-09 -- Plan 03-01 executed, FL client and FedAvg aggregation implemented
+Phase: 3 of 5 (Federated Learning Infrastructure) -- COMPLETE
+Plan: 2 of 2 in current phase (03-01 complete, 03-02 complete)
+Status: Phase 3 complete, ready for Phase 4
+Last activity: 2026-03-09 -- Plan 03-02 executed, FL orchestration loop, CLI, convergence check implemented
 
-Progress: [████████░░] 86%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 5min
-- Total execution time: 0.5 hours
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
@@ -45,10 +45,10 @@ Progress: [████████░░] 86%
 |-------|-------|-------|----------|
 | 1 | 3 | 20min | 7min |
 | 2 | 2 | 6min | 3min |
-| 3 | 1 | 6min | 6min |
+| 3 | 2 | 11min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (3min), 02-01 (2min), 02-02 (4min), 03-01 (6min)
+- Last 5 plans: 02-01 (2min), 02-02 (4min), 03-01 (6min), 03-02 (5min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -82,6 +82,10 @@ Recent decisions affecting current work:
 - [02-02]: Auto-run data pipeline if cached tensors missing for zero-config standalone training
 - [03-01]: In-place parameter copy via copy_() instead of load_state_dict to preserve optimizer tensor references
 - [03-01]: get_parameters returns numpy copies (not views) to prevent mutation bugs across FL rounds
+- [03-02]: Fresh MLP and Adam optimizer created per client per round to avoid shared state bugs (Pitfall 6 & 2)
+- [03-02]: Convergence check uses mean F1 of first n vs last n rounds with adaptive n for short histories
+- [03-02]: Metrics JSON embeds full config snapshot for thesis reproducibility
+- [03-02]: CLI overrides (--num-clients, --num-rounds) mutate config dict before passing to run_federated_training
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T19:29:20Z
-Stopped at: Completed 03-01-PLAN.md
-Resume file: .planning/phases/03-federated-learning-infrastructure/03-01-SUMMARY.md
+Last session: 2026-03-09T19:37:33Z
+Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
+Resume file: .planning/phases/03-federated-learning-infrastructure/03-02-SUMMARY.md
