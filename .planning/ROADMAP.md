@@ -53,7 +53,7 @@ Plans:
 - [x] 02-02-PLAN.md — Training loop, evaluation, checkpointing, standalone entry point, and tests
 
 ### Phase 3: Federated Learning Infrastructure
-**Goal**: Users can start a Flower server and multiple clients that complete federated training rounds, with model weights aggregated via FedAvg and per-round metrics logged
+**Goal**: Users can run a pure-Python FedAvg federated training loop with multiple virtual clients, per-round metrics logged to console, and global model convergence demonstrated
 **Depends on**: Phase 1, Phase 2
 **Requirements**: FLRN-01, FLRN-02, FLRN-03, EVAL-01
 **Success Criteria** (what must be TRUE):
@@ -61,10 +61,11 @@ Plans:
   2. Clients train locally on their data partitions, send only model weights (no raw data) to the server, and receive aggregated global weights back each round
   3. FedAvg aggregation completes for a configurable number of rounds (default 10-20), with per-round accuracy, precision, recall, and F1 logged to console
   4. The global model improves over rounds (F1 in later rounds is higher than F1 in early rounds, demonstrating convergence)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — FederatedClient class, FedAvg aggregation, server-side evaluation, and unit tests
+- [ ] 03-02-PLAN.md — Orchestration loop, CLI entry point, metrics persistence, checkpointing, convergence check
 
 ### Phase 4: Evaluation and Visualization
 **Goal**: Users can evaluate the final federated model on held-out test data and generate publication-quality plots that demonstrate the system works
@@ -102,6 +103,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
 | 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
-| 3. Federated Learning Infrastructure | 0/? | Not started | - |
+| 3. Federated Learning Infrastructure | 0/2 | Not started | - |
 | 4. Evaluation and Visualization | 0/? | Not started | - |
 | 5. Integration and Polish | 0/? | Not started | - |
