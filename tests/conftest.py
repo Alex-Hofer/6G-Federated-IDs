@@ -281,3 +281,66 @@ def sample_model():
         num_classes=2, dropout=0.1.
     """
     return MLP(input_dim=10, hidden_layers=[32, 16], num_classes=2, dropout=0.1)
+
+
+# ---------------------------------------------------------------------------
+# Federated learning fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def fl_train_loaders(synthetic_train_data):
+    """Create 3 synthetic client DataLoaders for FL unit tests.
+
+    Manually splits synthetic_train_data into 3 roughly equal chunks
+    (~66 samples each) and wraps them in DataLoaders with batch_size=32.
+
+    Returns:
+        List of 3 DataLoaders, one per simulated client.
+    """
+    from torch.utils.data import DataLoader, TensorDataset
+
+    X, y = synthetic_train_data
+    n = len(y)
+    chunk = n // 3
+
+    loaders = []
+    for i in range(3):
+        start = i * chunk
+        end = start + chunk if i < 2 else n
+        X_chunk = torch.tensor(X[start:end], dtype=torch.float32)
+        y_chunk = torch.tensor(y[start:end], dtype=torch.int64)
+        dataset = TensorDataset(X_chunk, y_chunk)
+        loaders.append(DataLoader(dataset, batch_size=32, shuffle=True))
+
+    return loaders
+
+
+@pytest.fixture
+def fl_test_loader():
+    """Create a single test DataLoader with ~50 synthetic samples.
+
+    Returns:
+        DataLoader with 50 samples, 10 features, batch_size=32.
+    """
+    from torch.utils.data import DataLoader, TensorDataset
+
+    rng = np.random.RandomState(99)
+    X = rng.randn(50, 10).astype(np.float32)
+    y = (rng.rand(50) < 0.3).astype(np.int64)
+
+    dataset = TensorDataset(
+        torch.tensor(X, dtype=torch.float32),
+        torch.tensor(y, dtype=torch.int64),
+    )
+    return DataLoader(dataset, batch_size=32, shuffle=False)
+
+
+@pytest.fixture
+def fl_criterion():
+    """Unweighted CrossEntropyLoss for FL unit tests.
+
+    Returns:
+        torch.nn.CrossEntropyLoss instance.
+    """
+    return torch.nn.CrossEntropyLoss()
