@@ -77,6 +77,15 @@ training:
   # class imbalance between BENIGN and DDoS samples.
   weighted_loss: true
 
+  # Number of epochs for standalone local training mode.
+  # Used when running `federated-ids-train` outside of FL.
+  standalone_epochs: 5
+
+  # Fraction of client data held out for validation during
+  # standalone training. Used for per-epoch metrics and
+  # best-model checkpoint selection.
+  val_split: 0.2
+
 # --- Federation ---
 # Flower federated learning configuration.
 federation:

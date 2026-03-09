@@ -27,6 +27,7 @@ dev = [
 
 [project.scripts]
 federated-ids-preprocess = "federated_ids.data.preprocess:main"
+federated-ids-train = "federated_ids.model.train:standalone_train"
 
 [tool.setuptools.packages.find]
 where = ["src"]
