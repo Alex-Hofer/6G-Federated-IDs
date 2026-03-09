@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-09T13:27:17Z"
-last_activity: 2026-03-09 -- Plan 01-01 executed
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-09T14:07:42Z"
+last_activity: 2026-03-09 -- Plan 01-02 executed
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 7
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -26,28 +26,28 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 1 of 5 (Project Foundation and Data Pipeline)
-Plan: 1 of 3 in current phase (complete)
+Plan: 2 of 3 in current phase (complete)
 Status: Executing Phase 1
-Last activity: 2026-03-09 -- Plan 01-01 executed
+Last activity: 2026-03-09 -- Plan 01-02 executed
 
-Progress: [▓░░░░░░░░░] 7%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 12min
-- Total execution time: 0.2 hours
+- Total plans completed: 2
+- Average duration: 9min
+- Total execution time: 0.3 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 1 | 12min | 12min |
+| 1 | 2 | 17min | 9min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (12min)
-- Trend: baseline
+- Last 5 plans: 01-01 (12min), 01-02 (5min)
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -65,6 +65,10 @@ Recent decisions affecting current work:
 - [01-01]: EnvYamlLoader subclass of SafeLoader to avoid global YAML loader mutation (Pitfall 7)
 - [01-01]: Anchored .gitignore patterns (/data/, /outputs/) to avoid ignoring src/federated_ids/data/
 - [01-01]: Config validation checks both top-level sections and required nested keys with descriptive error messages
+- [01-02]: Domain shortlist of 44 DDoS-relevant features with fallback to all numeric columns if fewer than target remain
+- [01-02]: Near-constant filter at >99% same value threshold in addition to zero-variance filter
+- [01-02]: Correlation filtering keeps the feature with higher variance from each correlated pair
+- [01-02]: Class weights saved as JSON (portable) alongside scaler saved as joblib pkl
 
 ### Pending Todos
 
@@ -77,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T13:27:17Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-project-foundation-and-data-pipeline/01-01-SUMMARY.md
+Last session: 2026-03-09T14:07:42Z
+Stopped at: Completed 01-02-PLAN.md
+Resume file: .planning/phases/01-project-foundation-and-data-pipeline/01-02-SUMMARY.md
