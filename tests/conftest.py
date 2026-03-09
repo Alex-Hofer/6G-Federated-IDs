@@ -2,16 +2,21 @@
 
 Provides reusable fixtures for configuration testing, including
 a minimal valid config dict and temporary config files. Also provides
-synthetic CICIDS2017 DataFrames for data pipeline testing.
+synthetic CICIDS2017 DataFrames for data pipeline testing and
+synthetic model/training fixtures for training loop tests.
 """
 
+import json
 import os
 import tempfile
 
 import numpy as np
 import pandas as pd
 import pytest
+import torch
 import yaml
+
+from federated_ids.model.model import MLP
 
 
 @pytest.fixture
@@ -226,3 +231,53 @@ def sample_csv_file(tmp_path, sample_cicids_df):
     csv_path = tmp_path / "test_data.csv"
     sample_cicids_df.to_csv(csv_path, index=False)
     return tmp_path
+
+
+# ---------------------------------------------------------------------------
+# Model / training synthetic data fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def synthetic_train_data():
+    """Create synthetic training data for model/training tests.
+
+    Returns:
+        Tuple of (X_train, y_train) as numpy arrays with ~200 samples,
+        10 features, binary labels with ~30% class 1 (imbalanced).
+    """
+    rng = np.random.RandomState(42)
+    n_samples = 200
+    n_features = 10
+
+    X = rng.randn(n_samples, n_features).astype(np.float32)
+    # ~30% class 1 (imbalanced)
+    y = (rng.rand(n_samples) < 0.3).astype(np.int64)
+
+    return X, y
+
+
+@pytest.fixture
+def synthetic_class_weights_file(tmp_path):
+    """Write a temporary class_weights.json file with imbalanced weights.
+
+    Returns:
+        Path to the temporary JSON file.
+    """
+    weights = {"0": 0.6, "1": 1.8}
+    weights_path = tmp_path / "class_weights.json"
+    with open(weights_path, "w") as f:
+        json.dump(weights, f)
+
+    return str(weights_path)
+
+
+@pytest.fixture
+def sample_model():
+    """Create a small MLP model for fast test execution.
+
+    Returns:
+        MLP instance with input_dim=10, hidden_layers=[32, 16],
+        num_classes=2, dropout=0.1.
+    """
+    return MLP(input_dim=10, hidden_layers=[32, 16], num_classes=2, dropout=0.1)
