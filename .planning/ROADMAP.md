@@ -76,10 +76,11 @@ Plans:
   2. Convergence plots (loss and F1 over FL rounds) are saved as PNG files showing training progression
   3. Per-client performance comparison is visualized, showing that all clients contribute meaningfully to the federated model
   4. TensorBoard logging captures training metrics for real-time monitoring during FL rounds
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Evaluation module: confusion matrix, classification report, convergence plots, per-client comparison, CLI entry point
+- [ ] 04-02-PLAN.md — TensorBoard SummaryWriter integration into FL training loop
 
 ### Phase 5: Integration and Polish
 **Goal**: Users can run the entire pipeline end-to-end with a single command and understand how to set up, configure, and reproduce the experiment
@@ -104,5 +105,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
 | 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
 | 3. Federated Learning Infrastructure | 0/2 | Not started | - |
-| 4. Evaluation and Visualization | 0/? | Not started | - |
+| 4. Evaluation and Visualization | 0/2 | Not started | - |
 | 5. Integration and Polish | 0/? | Not started | - |
