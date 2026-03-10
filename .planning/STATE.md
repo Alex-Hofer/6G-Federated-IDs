@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: "Completed 05-01-PLAN.md"
-last_updated: "2026-03-10T09:02:31Z"
-last_activity: 2026-03-10 -- Plan 05-01 executed, end-to-end pipeline runner and integration test
+status: complete
+stopped_at: "Completed 05-02-PLAN.md"
+last_updated: "2026-03-10T09:24:58Z"
+last_activity: 2026-03-10 -- Plan 05-02 executed, README rewrite as thesis-reproducibility guide
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Detect DDoS attacks across a federated network of edge nodes without any client ever sharing its raw network traffic data.
-**Current focus:** Phase 5 in progress. Pipeline runner complete, documentation remaining.
+**Current focus:** All phases complete. Milestone v1.0 delivered.
 
 ## Current Position
 
 Phase: 5 of 5 (Integration & Polish)
-Plan: 1 of 2 in current phase (05-01 complete)
-Status: Phase 5 in progress
-Last activity: 2026-03-10 -- Plan 05-01 executed, end-to-end pipeline runner and integration test
+Plan: 2 of 2 in current phase (all complete)
+Status: Milestone complete
+Last activity: 2026-03-10 -- Plan 05-02 executed, README rewrite as thesis-reproducibility guide
 
-Progress: [█████████░] 91%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 5min
-- Total execution time: 0.75 hours
+- Total execution time: 0.83 hours
 
 **By Phase:**
 
@@ -47,14 +47,15 @@ Progress: [█████████░] 91%
 | 2 | 2 | 6min | 3min |
 | 3 | 2 | 11min | 6min |
 | 4 | 2 | ~6min | ~3min |
-| 5 | 1/2 | 3min | 3min |
+| 5 | 2/2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (6min), 03-02 (5min), 04-01 (~3min), 04-02 (3min), 05-01 (3min)
+- Last 5 plans: 03-02 (5min), 04-01 (~3min), 04-02 (3min), 05-01 (3min), 05-02 (5min)
 - Trend: stable
 
 *Updated after each plan completion*
 | Phase 05 P01 | 3min | 2 tasks | 3 files |
+| Phase 05 P02 | 5min | 2 tasks | 1 file |
 
 ## Accumulated Context
 
@@ -99,6 +100,9 @@ Recent decisions affecting current work:
 - [05-01]: Lazy imports for stage modules to keep pipeline module import lightweight
 - [05-01]: No try/except around stages -- fail-fast by letting exceptions propagate
 - [05-01]: Registered pytest slow marker in pyproject.toml to suppress unknown mark warning
+- [05-02]: README written in English per user decision
+- [05-02]: Screenshot embeds use docs/ folder with instructions to generate from pipeline output
+- [05-02]: README structured as 15-section thesis-reproducibility guide covering clone-to-results workflow
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T09:02:31Z
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-integration-and-polish/05-01-SUMMARY.md
+Last session: 2026-03-10T09:24:58Z
+Stopped at: Completed 05-02-PLAN.md -- All plans complete, milestone v1.0 delivered
+Resume file: .planning/phases/05-integration-and-polish/05-02-SUMMARY.md

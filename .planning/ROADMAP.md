@@ -12,11 +12,11 @@ This roadmap delivers a privacy-preserving Intrusion Detection System using Fede
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Foundation and Data Pipeline** - Scaffold the project and build a validated CICIDS2017 preprocessing pipeline that produces clean, normalized, partitioned DataLoaders
-- [ ] **Phase 2: Model Definition and Local Training** - Define the MLP model and validate local training on a single partition with correct loss and metrics
-- [ ] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients
+- [x] **Phase 1: Project Foundation and Data Pipeline** - Scaffold the project and build a validated CICIDS2017 preprocessing pipeline that produces clean, normalized, partitioned DataLoaders (completed 2026-03-09)
+- [x] **Phase 2: Model Definition and Local Training** - Define the MLP model and validate local training on a single partition with correct loss and metrics (completed 2026-03-09)
+- [x] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients (completed 2026-03-09)
 - [x] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots (completed 2026-03-09)
-- [ ] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation
+- [x] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation (completed 2026-03-10)
 
 ## Phase Details
 
@@ -64,8 +64,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — FederatedClient class, FedAvg aggregation, server-side evaluation, and unit tests
-- [ ] 03-02-PLAN.md — Orchestration loop, CLI entry point, metrics persistence, checkpointing, convergence check
+- [x] 03-01-PLAN.md — FederatedClient class, FedAvg aggregation, server-side evaluation, and unit tests
+- [x] 03-02-PLAN.md — Orchestration loop, CLI entry point, metrics persistence, checkpointing, convergence check
 
 ### Phase 4: Evaluation and Visualization
 **Goal**: Users can evaluate the final federated model on held-out test data and generate publication-quality plots that demonstrate the system works
@@ -79,8 +79,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 04-01-PLAN.md — Evaluation module: confusion matrix, classification report, convergence plots, per-client comparison, CLI entry point
-- [ ] 04-02-PLAN.md — TensorBoard SummaryWriter integration into FL training loop
+- [x] 04-01-PLAN.md — Evaluation module: confusion matrix, classification report, convergence plots, per-client comparison, CLI entry point
+- [x] 04-02-PLAN.md — TensorBoard SummaryWriter integration into FL training loop
 
 ### Phase 5: Integration and Polish
 **Goal**: Users can run the entire pipeline end-to-end with a single command and understand how to set up, configure, and reproduce the experiment
@@ -93,8 +93,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Pipeline runner module, console script registration, integration test with synthetic data
-- [ ] 05-02-PLAN.md — README rewrite as thesis-reproducibility guide, output screenshots
+- [x] 05-01-PLAN.md — Pipeline runner module, console script registration, integration test with synthetic data
+- [x] 05-02-PLAN.md — README rewrite as thesis-reproducibility guide, output screenshots
 
 ## Progress
 
@@ -105,6 +105,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
 | 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
-| 3. Federated Learning Infrastructure | 0/2 | Not started | - |
+| 3. Federated Learning Infrastructure | 2/2 | Complete | 2026-03-09 |
 | 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
-| 5. Integration and Polish | 0/2 | Not started | - |
+| 5. Integration and Polish | 2/2 | Complete | 2026-03-10 |
