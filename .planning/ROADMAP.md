@@ -111,7 +111,11 @@ Plans:
   4. DATA-03 verified: StandardScaler fitted on training data only, no data leakage
   5. DATA-05 verified: IID partitioning across configurable clients with stratified splits
   6. INFR-01 verified: YAML config controls all hyperparameters
-**Plans:** 0 plans
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Fix select_features re-export, regression test, and verification script
+- [ ] 06-02-PLAN.md — Produce VERIFICATION.md and update REQUIREMENTS.md traceability
 
 ### Phase 7: Verify Phase 4 & Integration Fixes
 **Goal**: Formally verify all Phase 4 requirements and fix standalone_train weighted_loss config inconsistency
@@ -138,5 +142,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Federated Learning Infrastructure | 2/2 | Complete | 2026-03-09 |
 | 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
 | 5. Integration and Polish | 3/3 | Complete   | 2026-03-10 |
-| 6. Verify Phase 1 Requirements | 0/0 | Pending | — |
+| 6. Verify Phase 1 Requirements | 0/2 | Pending | — |
 | 7. Verify Phase 4 & Integration Fixes | 0/0 | Pending | — |
