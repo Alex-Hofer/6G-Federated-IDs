@@ -90,10 +90,11 @@ Plans:
   1. A shell script or entry point launches the server and N clients, runs federated training, evaluates the global model, and saves all outputs (metrics, plots, checkpoints) to an organized directory structure
   2. Running the full pipeline from a clean environment (fresh install, data download, training, evaluation) completes without errors and produces all expected outputs
   3. A README documents setup instructions, data download steps, configuration options, and usage examples sufficient for someone unfamiliar with the project to reproduce results
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Pipeline runner module, console script registration, integration test with synthetic data
+- [ ] 05-02-PLAN.md — README rewrite as thesis-reproducibility guide, output screenshots
 
 ## Progress
 
@@ -106,4 +107,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
 | 3. Federated Learning Infrastructure | 0/2 | Not started | - |
 | 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
-| 5. Integration and Polish | 0/? | Not started | - |
+| 5. Integration and Polish | 0/2 | Not started | - |
