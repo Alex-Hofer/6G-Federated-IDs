@@ -17,6 +17,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients (completed 2026-03-09)
 - [x] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots (completed 2026-03-09)
 - [x] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation (completed 2026-03-10)
+- [ ] **Phase 6: Verify Phase 1 Requirements** - Formally verify Phase 1 requirements (DATA-01, DATA-02, DATA-03, DATA-05, INFR-01) and fix select_features re-export
+- [ ] **Phase 7: Verify Phase 4 & Integration Fixes** - Formally verify Phase 4 requirements (EVAL-02, EVAL-03, EVAL-04) and fix standalone_train weighted_loss flag
 
 ## Phase Details
 
@@ -97,10 +99,37 @@ Plans:
 - [x] 05-02-PLAN.md — README rewrite as thesis-reproducibility guide, output screenshots
 - [ ] 05-03-PLAN.md — Gap closure: generate example screenshot PNGs for docs/, fix requirements traceability
 
+### Phase 6: Verify Phase 1 Requirements
+**Goal**: Formally verify all Phase 1 requirements by running code paths, validating outputs, and creating VERIFICATION.md to close orphaned requirement gaps
+**Depends on**: Phase 1
+**Requirements**: DATA-01, DATA-02, DATA-03, DATA-05, INFR-01
+**Gap Closure:** Closes gaps from v1.0 audit (8 orphaned requirements — Phase 1 portion)
+**Success Criteria** (what must be TRUE):
+  1. Phase 1 VERIFICATION.md exists with pass/fail results for each requirement
+  2. DATA-01 verified: CSV loading and cleaning produces zero Inf/NaN values
+  3. DATA-02 verified: Feature selection reduces columns to 20-40 range; select_features re-exported from data/__init__.py
+  4. DATA-03 verified: StandardScaler fitted on training data only, no data leakage
+  5. DATA-05 verified: IID partitioning across configurable clients with stratified splits
+  6. INFR-01 verified: YAML config controls all hyperparameters
+**Plans:** 0 plans
+
+### Phase 7: Verify Phase 4 & Integration Fixes
+**Goal**: Formally verify all Phase 4 requirements and fix standalone_train weighted_loss config inconsistency
+**Depends on**: Phase 4
+**Requirements**: EVAL-02, EVAL-03, EVAL-04
+**Gap Closure:** Closes gaps from v1.0 audit (8 orphaned requirements — Phase 4 portion + integration fixes)
+**Success Criteria** (what must be TRUE):
+  1. Phase 4 VERIFICATION.md exists with pass/fail results for each requirement
+  2. EVAL-02 verified: Confusion matrix and classification report generated on held-out test set
+  3. EVAL-03 verified: Convergence plots saved as PNG files
+  4. EVAL-04 verified: TensorBoard logging captures training metrics
+  5. standalone_train respects weighted_loss config flag (no longer always applies weighted loss)
+**Plans:** 0 plans
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -109,3 +138,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Federated Learning Infrastructure | 2/2 | Complete | 2026-03-09 |
 | 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
 | 5. Integration and Polish | 3/3 | Complete   | 2026-03-10 |
+| 6. Verify Phase 1 Requirements | 0/0 | Pending | — |
+| 7. Verify Phase 4 & Integration Fixes | 0/0 | Pending | — |

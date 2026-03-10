@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Pipeline
 
-- [x] **DATA-01**: Load CICIDS2017 CSV files and clean data (handle inf/NaN values, whitespace column names, constant columns)
-- [x] **DATA-02**: Select and engineer features (reduce 78+ raw features to 20-40 informative ones)
-- [x] **DATA-03**: Normalize features with StandardScaler fitted on training data only (no data leakage)
+- [ ] **DATA-01**: Load CICIDS2017 CSV files and clean data (handle inf/NaN values, whitespace column names, constant columns)
+- [ ] **DATA-02**: Select and engineer features (reduce 78+ raw features to 20-40 informative ones)
+- [ ] **DATA-03**: Normalize features with StandardScaler fitted on training data only (no data leakage)
 - [x] **DATA-04**: Handle class imbalance via weighted cross-entropy loss for DDoS minority class
-- [x] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
+- [ ] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
 
 ### Model
 
@@ -30,13 +30,13 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Evaluation & Visualization
 
 - [x] **EVAL-01**: Log per-round metrics (accuracy, precision, recall, F1) to console
-- [x] **EVAL-02**: Generate confusion matrix and classification report on held-out test set
-- [x] **EVAL-03**: Save convergence plots (loss and accuracy over FL rounds) as PNG
-- [x] **EVAL-04**: Log training metrics to TensorBoard for real-time monitoring
+- [ ] **EVAL-02**: Generate confusion matrix and classification report on held-out test set
+- [ ] **EVAL-03**: Save convergence plots (loss and accuracy over FL rounds) as PNG
+- [ ] **EVAL-04**: Log training metrics to TensorBoard for real-time monitoring
 
 ### Infrastructure
 
-- [x] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
+- [ ] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
 - [x] **INFR-02**: Reproducibility via fixed seeds, pyproject.toml, and documented hyperparameters
 
 ## v2 Requirements
@@ -85,11 +85,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 1 | Complete |
-| DATA-02 | Phase 1 | Complete |
-| DATA-03 | Phase 1 | Complete |
+| DATA-01 | Phase 1 (impl), Phase 6 (verify) | Pending |
+| DATA-02 | Phase 1 (impl), Phase 6 (verify) | Pending |
+| DATA-03 | Phase 1 (impl), Phase 6 (verify) | Pending |
 | DATA-04 | Phase 1 | Complete |
-| DATA-05 | Phase 1 | Complete |
+| DATA-05 | Phase 1 (impl), Phase 6 (verify) | Pending |
 | MODL-01 | Phase 2 | Complete |
 | MODL-02 | Phase 2 | Complete |
 | MODL-03 | Phase 2 (impl), Phase 5 (validated) | Complete |
@@ -97,10 +97,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FLRN-02 | Phase 3 | Complete |
 | FLRN-03 | Phase 3 | Complete |
 | EVAL-01 | Phase 3 | Complete |
-| EVAL-02 | Phase 4 | Complete |
-| EVAL-03 | Phase 4 | Complete |
-| EVAL-04 | Phase 4 | Complete |
-| INFR-01 | Phase 1 | Complete |
+| EVAL-02 | Phase 4 (impl), Phase 7 (verify) | Pending |
+| EVAL-03 | Phase 4 (impl), Phase 7 (verify) | Pending |
+| EVAL-04 | Phase 4 (impl), Phase 7 (verify) | Pending |
+| INFR-01 | Phase 1 (impl), Phase 6 (verify) | Pending |
 | INFR-02 | Phase 1 (impl), Phase 5 (validated) | Complete |
 
 **Coverage:**
@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 after 05-03 execution (Phase 5 validation cross-references)*
+*Last updated: 2026-03-10 — gap closure phases 6-7 added, 8 orphaned requirements reset to Pending*
