@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: Load CICIDS2017 CSV files and clean data (handle inf/NaN values, whitespace column names, constant columns)
-- [ ] **DATA-02**: Select and engineer features (reduce 78+ raw features to 20-40 informative ones)
-- [ ] **DATA-03**: Normalize features with StandardScaler fitted on training data only (no data leakage)
+- [x] **DATA-01**: Load CICIDS2017 CSV files and clean data (handle inf/NaN values, whitespace column names, constant columns)
+- [x] **DATA-02**: Select and engineer features (reduce 78+ raw features to 20-40 informative ones)
+- [x] **DATA-03**: Normalize features with StandardScaler fitted on training data only (no data leakage)
 - [x] **DATA-04**: Handle class imbalance via weighted cross-entropy loss for DDoS minority class
-- [ ] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
+- [x] **DATA-05**: Partition data IID across 2-5 clients with stratified splits maintaining class ratios
 
 ### Model
 
@@ -36,7 +36,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
+- [x] **INFR-01**: Configuration file (YAML/JSON) for all hyperparameters (LR, epochs, batch size, FL rounds, num clients)
 - [x] **INFR-02**: Reproducibility via fixed seeds, pyproject.toml, and documented hyperparameters
 
 ## v2 Requirements
@@ -85,11 +85,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 1 (impl), Phase 6 (verify) | Pending |
-| DATA-02 | Phase 1 (impl), Phase 6 (verify) | Pending |
-| DATA-03 | Phase 1 (impl), Phase 6 (verify) | Pending |
+| DATA-01 | Phase 1 (impl), Phase 6 (verify) | Complete |
+| DATA-02 | Phase 1 (impl), Phase 6 (verify) | Complete |
+| DATA-03 | Phase 1 (impl), Phase 6 (verify) | Complete |
 | DATA-04 | Phase 1 | Complete |
-| DATA-05 | Phase 1 (impl), Phase 6 (verify) | Pending |
+| DATA-05 | Phase 1 (impl), Phase 6 (verify) | Complete |
 | MODL-01 | Phase 2 | Complete |
 | MODL-02 | Phase 2 | Complete |
 | MODL-03 | Phase 2 (impl), Phase 5 (validated) | Complete |
@@ -100,7 +100,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVAL-02 | Phase 4 (impl), Phase 7 (verify) | Pending |
 | EVAL-03 | Phase 4 (impl), Phase 7 (verify) | Pending |
 | EVAL-04 | Phase 4 (impl), Phase 7 (verify) | Pending |
-| INFR-01 | Phase 1 (impl), Phase 6 (verify) | Pending |
+| INFR-01 | Phase 1 (impl), Phase 6 (verify) | Complete |
 | INFR-02 | Phase 1 (impl), Phase 5 (validated) | Complete |
 
 **Coverage:**
