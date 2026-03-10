@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients (completed 2026-03-09)
 - [x] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots (completed 2026-03-09)
 - [x] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation (completed 2026-03-10)
-- [ ] **Phase 6: Verify Phase 1 Requirements** - Formally verify Phase 1 requirements (DATA-01, DATA-02, DATA-03, DATA-05, INFR-01) and fix select_features re-export
+- [x] **Phase 6: Verify Phase 1 Requirements** - Formally verify Phase 1 requirements (DATA-01, DATA-02, DATA-03, DATA-05, INFR-01) and fix select_features re-export (completed 2026-03-10)
 - [ ] **Phase 7: Verify Phase 4 & Integration Fixes** - Formally verify Phase 4 requirements (EVAL-02, EVAL-03, EVAL-04) and fix standalone_train weighted_loss flag
 
 ## Phase Details
@@ -111,7 +111,7 @@ Plans:
   4. DATA-03 verified: StandardScaler fitted on training data only, no data leakage
   5. DATA-05 verified: IID partitioning across configurable clients with stratified splits
   6. INFR-01 verified: YAML config controls all hyperparameters
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 06-01-PLAN.md — Fix select_features re-export, regression test, and verification script
@@ -142,5 +142,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Federated Learning Infrastructure | 2/2 | Complete | 2026-03-09 |
 | 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
 | 5. Integration and Polish | 3/3 | Complete   | 2026-03-10 |
-| 6. Verify Phase 1 Requirements | 0/2 | Pending | — |
+| 6. Verify Phase 1 Requirements | 2/2 | Complete   | 2026-03-10 |
 | 7. Verify Phase 4 & Integration Fixes | 0/0 | Pending | — |
