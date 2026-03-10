@@ -258,6 +258,181 @@ class TestCheckpointing:
         assert torch.equal(out1, out2), "Loaded model produces different output"
 
 
+class TestWeightedLossConfig:
+    """Tests for the weighted_loss config flag in standalone_train.
+
+    Verifies that standalone_train respects the weighted_loss configuration:
+    - weighted_loss=true  -> CrossEntropyLoss WITH weight parameter
+    - weighted_loss=false -> CrossEntropyLoss WITHOUT weight parameter
+    - weighted_loss absent -> defaults to unweighted (same as false)
+
+    Distinct from TestWeightedLoss which tests weight tensor creation from JSON.
+    """
+
+    def test_weighted_loss_true_uses_weights(self, tmp_path):
+        """standalone_train with weighted_loss=true creates weighted CrossEntropyLoss."""
+        from unittest.mock import patch
+
+        # Setup synthetic cached tensors
+        self._create_synthetic_data(tmp_path)
+
+        config = self._make_config(tmp_path, weighted_loss=True)
+
+        captured_criteria = []
+
+        original_ce = torch.nn.CrossEntropyLoss
+
+        def capture_ce(*args, **kwargs):
+            instance = original_ce(*args, **kwargs)
+            captured_criteria.append(instance)
+            return instance
+
+        with patch("federated_ids.model.train.torch.nn.CrossEntropyLoss", side_effect=capture_ce):
+            from federated_ids.model.train import standalone_train
+
+            standalone_train(config_path=str(tmp_path / "config.yaml"), client_id=0)
+
+        # The criterion used for training should have weights
+        assert len(captured_criteria) > 0, "CrossEntropyLoss was never constructed"
+        criterion = captured_criteria[0]
+        assert criterion.weight is not None, (
+            "weighted_loss=true but CrossEntropyLoss has no weight"
+        )
+
+    def test_weighted_loss_false_no_weights(self, tmp_path):
+        """standalone_train with weighted_loss=false creates unweighted CrossEntropyLoss."""
+        from unittest.mock import patch
+
+        self._create_synthetic_data(tmp_path)
+
+        config = self._make_config(tmp_path, weighted_loss=False)
+
+        captured_criteria = []
+
+        original_ce = torch.nn.CrossEntropyLoss
+
+        def capture_ce(*args, **kwargs):
+            instance = original_ce(*args, **kwargs)
+            captured_criteria.append(instance)
+            return instance
+
+        with patch("federated_ids.model.train.torch.nn.CrossEntropyLoss", side_effect=capture_ce):
+            from federated_ids.model.train import standalone_train
+
+            standalone_train(config_path=str(tmp_path / "config.yaml"), client_id=0)
+
+        assert len(captured_criteria) > 0, "CrossEntropyLoss was never constructed"
+        criterion = captured_criteria[0]
+        assert criterion.weight is None, (
+            "weighted_loss=false but CrossEntropyLoss has weight"
+        )
+
+    def test_weighted_loss_absent_defaults_to_unweighted(self, tmp_path):
+        """standalone_train with no weighted_loss key creates unweighted CrossEntropyLoss."""
+        from unittest.mock import patch
+
+        self._create_synthetic_data(tmp_path)
+
+        config = self._make_config(tmp_path, weighted_loss=None)
+
+        captured_criteria = []
+
+        original_ce = torch.nn.CrossEntropyLoss
+
+        def capture_ce(*args, **kwargs):
+            instance = original_ce(*args, **kwargs)
+            captured_criteria.append(instance)
+            return instance
+
+        with patch("federated_ids.model.train.torch.nn.CrossEntropyLoss", side_effect=capture_ce):
+            from federated_ids.model.train import standalone_train
+
+            standalone_train(config_path=str(tmp_path / "config.yaml"), client_id=0)
+
+        assert len(captured_criteria) > 0, "CrossEntropyLoss was never constructed"
+        criterion = captured_criteria[0]
+        assert criterion.weight is None, (
+            "weighted_loss absent but CrossEntropyLoss has weight (should default to unweighted)"
+        )
+
+    @staticmethod
+    def _create_synthetic_data(tmp_path):
+        """Create minimal synthetic cached tensors and class_weights.json in tmp_path."""
+        import json
+
+        processed_dir = tmp_path / "processed"
+        processed_dir.mkdir(exist_ok=True)
+
+        rng = np.random.RandomState(42)
+        n_samples, n_features = 100, 10
+
+        X = torch.tensor(rng.randn(n_samples, n_features), dtype=torch.float32)
+        y = torch.tensor((rng.rand(n_samples) < 0.3).astype(np.int64))
+
+        torch.save(X, str(processed_dir / "X_train.pt"))
+        torch.save(y, str(processed_dir / "y_train.pt"))
+        torch.save(X[:20], str(processed_dir / "X_test.pt"))
+        torch.save(y[:20], str(processed_dir / "y_test.pt"))
+
+        weights = {"0": 0.6, "1": 1.8}
+        with open(processed_dir / "class_weights.json", "w") as f:
+            json.dump(weights, f)
+
+    @staticmethod
+    def _make_config(tmp_path, weighted_loss):
+        """Create a minimal config YAML file for standalone_train tests.
+
+        Args:
+            weighted_loss: True, False, or None (absent from config).
+        """
+        import yaml
+
+        processed_dir = str(tmp_path / "processed").replace("\\", "/")
+        output_dir = str(tmp_path / "outputs").replace("\\", "/")
+
+        training = {
+            "learning_rate": 0.001,
+            "batch_size": 32,
+            "local_epochs": 1,
+            "standalone_epochs": 1,
+            "val_split": 0.2,
+        }
+        if weighted_loss is not None:
+            training["weighted_loss"] = weighted_loss
+
+        config = {
+            "data": {
+                "raw_dir": str(tmp_path / "raw").replace("\\", "/"),
+                "processed_dir": processed_dir,
+                "files": [],
+                "test_size": 0.2,
+                "target_features": 10,
+                "correlation_threshold": 0.95,
+                "variance_threshold": 1e-10,
+            },
+            "model": {
+                "hidden_layers": [16, 8],
+                "num_classes": 2,
+                "dropout": 0.1,
+            },
+            "training": training,
+            "federation": {
+                "num_clients": 2,
+                "num_rounds": 2,
+                "fraction_fit": 1.0,
+            },
+            "seed": 42,
+            "output_dir": output_dir,
+            "log_level": "WARNING",
+        }
+
+        config_path = tmp_path / "config.yaml"
+        with open(config_path, "w") as f:
+            yaml.dump(config, f)
+
+        return config
+
+
 class TestSummaryTable:
     """Tests for summary table logging."""
 
