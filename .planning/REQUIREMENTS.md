@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 — Phase 6 verification complete, DATA-01/02/03/05 and INFR-01 verified via scripts/verify_phase1.py (see 06-VERIFICATION.md)*
+*Last updated: 2026-03-10 -- Phase 7 verification complete, EVAL-02/03/04 verified via scripts/verify_phase4.py (see 07-VERIFICATION.md). All 17 v1 requirements verified across Phase 6 and Phase 7.*
