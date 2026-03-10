@@ -31,6 +31,7 @@ federated-ids-preprocess = "federated_ids.data.preprocess:main"
 federated-ids-train = "federated_ids.model.train:standalone_train"
 federated-ids-train-fl = "federated_ids.fl.__main__:main"
 federated-ids-evaluate = "federated_ids.eval.__main__:main"
+federated-ids-run-all = "federated_ids.pipeline:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
