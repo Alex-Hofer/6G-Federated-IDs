@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-10T08:37:19.065Z"
-last_activity: 2026-03-09 -- Plan 04-02 executed, TensorBoard SummaryWriter integrated into FL training loop
+status: in-progress
+stopped_at: "Completed 05-01-PLAN.md"
+last_updated: "2026-03-10T09:02:31Z"
+last_activity: 2026-03-10 -- Plan 05-01 executed, end-to-end pipeline runner and integration test
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_plans: 11
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Detect DDoS attacks across a federated network of edge nodes without any client ever sharing its raw network traffic data.
-**Current focus:** Phase 4 complete. Ready for Phase 5: Integration & Thesis
+**Current focus:** Phase 5 in progress. Pipeline runner complete, documentation remaining.
 
 ## Current Position
 
-Phase: 4 of 5 (Evaluation & Visualization) -- COMPLETE
-Plan: 2 of 2 in current phase (04-01 complete, 04-02 complete)
-Status: Phase 4 complete, ready for Phase 5
-Last activity: 2026-03-09 -- Plan 04-02 executed, TensorBoard SummaryWriter integrated into FL training loop
+Phase: 5 of 5 (Integration & Polish)
+Plan: 1 of 2 in current phase (05-01 complete)
+Status: Phase 5 in progress
+Last activity: 2026-03-10 -- Plan 05-01 executed, end-to-end pipeline runner and integration test
 
-Progress: [██████████] 100%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 5min
-- Total execution time: 0.7 hours
+- Total execution time: 0.75 hours
 
 **By Phase:**
 
@@ -47,13 +47,14 @@ Progress: [██████████] 100%
 | 2 | 2 | 6min | 3min |
 | 3 | 2 | 11min | 6min |
 | 4 | 2 | ~6min | ~3min |
+| 5 | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4min), 03-01 (6min), 03-02 (5min), 04-01 (~3min), 04-02 (3min)
+- Last 5 plans: 03-01 (6min), 03-02 (5min), 04-01 (~3min), 04-02 (3min), 05-01 (3min)
 - Trend: stable
 
 *Updated after each plan completion*
-| Phase 04 P01 | 5min | 2 tasks | 6 files |
+| Phase 05 P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [04-02]: Conditional import with _HAS_TENSORBOARD flag for graceful degradation when tensorboard not installed
 - [04-02]: try/finally block wrapping entire FL loop and post-training to guarantee writer.close()
 - [04-02]: Global-only metrics (no per-client TB logging) per user decision
+- [05-01]: Lazy imports for stage modules to keep pipeline module import lightweight
+- [05-01]: No try/except around stages -- fail-fast by letting exceptions propagate
+- [05-01]: Registered pytest slow marker in pyproject.toml to suppress unknown mark warning
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T08:37:19.061Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-integration-and-polish/05-CONTEXT.md
+Last session: 2026-03-10T09:02:31Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: .planning/phases/05-integration-and-polish/05-01-SUMMARY.md
