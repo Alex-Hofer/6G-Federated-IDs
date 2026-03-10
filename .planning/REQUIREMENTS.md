@@ -92,7 +92,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-05 | Phase 1 | Complete |
 | MODL-01 | Phase 2 | Complete |
 | MODL-02 | Phase 2 | Complete |
-| MODL-03 | Phase 2 | Complete |
+| MODL-03 | Phase 2 (impl), Phase 5 (validated) | Complete |
 | FLRN-01 | Phase 3 | Complete |
 | FLRN-02 | Phase 3 | Complete |
 | FLRN-03 | Phase 3 | Complete |
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVAL-03 | Phase 4 | Complete |
 | EVAL-04 | Phase 4 | Complete |
 | INFR-01 | Phase 1 | Complete |
-| INFR-02 | Phase 1 | Complete |
+| INFR-02 | Phase 1 (impl), Phase 5 (validated) | Complete |
 
 **Coverage:**
 - v1 requirements: 17 total
@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 after 05-02 execution*
+*Last updated: 2026-03-10 after 05-03 execution (Phase 5 validation cross-references)*
