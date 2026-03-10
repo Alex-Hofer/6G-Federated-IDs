@@ -273,3 +273,15 @@ class TestReproducibility:
             result1["y_test"], result2["y_test"],
             err_msg="y_test differs between identical runs"
         )
+
+
+class TestSelectFeaturesReExport:
+    """Regression test: select_features must be importable from federated_ids.data."""
+
+    def test_import_from_package(self):
+        """select_features is importable from federated_ids.data and is callable."""
+        from federated_ids.data import select_features
+
+        assert callable(select_features), (
+            "select_features should be callable"
+        )
