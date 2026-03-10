@@ -321,18 +321,21 @@ def standalone_train(
     )
 
     # --- Class-weighted loss ---
-    weights_path = os.path.join(processed_dir, "class_weights.json")
-    with open(weights_path) as f:
-        raw_weights = json.load(f)
-
-    num_classes = model_config["num_classes"]
-    weight_tensor = torch.tensor(
-        [raw_weights[str(i)] for i in range(num_classes)],
-        dtype=torch.float32,
-    ).to(device)
-    criterion = torch.nn.CrossEntropyLoss(weight=weight_tensor)
-
-    logger.info("Using class-weighted loss: %s (device=%s)", raw_weights, device)
+    weighted_loss = training_config.get("weighted_loss", False)
+    if weighted_loss:
+        weights_path = os.path.join(processed_dir, "class_weights.json")
+        with open(weights_path) as f:
+            raw_weights = json.load(f)
+        num_classes = model_config["num_classes"]
+        weight_tensor = torch.tensor(
+            [raw_weights[str(i)] for i in range(num_classes)],
+            dtype=torch.float32,
+        ).to(device)
+        criterion = torch.nn.CrossEntropyLoss(weight=weight_tensor)
+        logger.info("Using class-weighted loss: %s (device=%s)", raw_weights, device)
+    else:
+        criterion = torch.nn.CrossEntropyLoss()
+        logger.info("Using unweighted loss (device=%s)", device)
 
     # --- Training loop ---
     best_f1 = 0.0
