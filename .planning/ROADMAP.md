@@ -1,150 +1,34 @@
 # Roadmap: 6G Federated IDS
 
-## Overview
+## Milestones
 
-This roadmap delivers a privacy-preserving Intrusion Detection System using Federated Learning across simulated 6G edge nodes. The build follows a strict dependency chain: data pipeline first (where most pitfalls live), then model definition and local training validation, then Flower-based federated learning infrastructure, then evaluation and visualization, and finally integration and polish. Each phase delivers a verifiable capability that the next phase depends on. By the end, the system detects DDoS attacks across a federated network of edge nodes without any client sharing its raw network traffic data.
+- **v1.0 MVP** — Phases 1-7 (shipped 2026-03-10)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>v1.0 MVP (Phases 1-7) — SHIPPED 2026-03-10</summary>
 
-Decimal phases appear between their surrounding integers in numeric order.
+- [x] Phase 1: Project Foundation & Data Pipeline (3/3 plans) — completed 2026-03-09
+- [x] Phase 2: Model Definition & Local Training (2/2 plans) — completed 2026-03-09
+- [x] Phase 3: Federated Learning Infrastructure (2/2 plans) — completed 2026-03-09
+- [x] Phase 4: Evaluation & Visualization (2/2 plans) — completed 2026-03-09
+- [x] Phase 5: Integration & Polish (3/3 plans) — completed 2026-03-10
+- [x] Phase 6: Verify Phase 1 Requirements (2/2 plans) — completed 2026-03-10
+- [x] Phase 7: Verify Phase 4 & Integration Fixes (2/2 plans) — completed 2026-03-10
 
-- [x] **Phase 1: Project Foundation and Data Pipeline** - Scaffold the project and build a validated CICIDS2017 preprocessing pipeline that produces clean, normalized, partitioned DataLoaders (completed 2026-03-09)
-- [x] **Phase 2: Model Definition and Local Training** - Define the MLP model and validate local training on a single partition with correct loss and metrics (completed 2026-03-09)
-- [x] **Phase 3: Federated Learning Infrastructure** - Wire model and data into Flower client-server protocol with FedAvg aggregation across multiple clients (completed 2026-03-09)
-- [x] **Phase 4: Evaluation and Visualization** - Evaluate the global federated model on held-out data and produce publication-quality plots (completed 2026-03-09)
-- [x] **Phase 5: Integration and Polish** - Tie all components into a single runnable pipeline with orchestration, end-to-end validation, and documentation (completed 2026-03-10)
-- [x] **Phase 6: Verify Phase 1 Requirements** - Formally verify Phase 1 requirements (DATA-01, DATA-02, DATA-03, DATA-05, INFR-01) and fix select_features re-export (completed 2026-03-10)
-- [ ] **Phase 7: Verify Phase 4 & Integration Fixes** - Formally verify Phase 4 requirements (EVAL-02, EVAL-03, EVAL-04) and fix standalone_train weighted_loss flag
+Full details: milestones/v1.0-ROADMAP.md
 
-## Phase Details
-
-### Phase 1: Project Foundation and Data Pipeline
-**Goal**: Users can run the data pipeline and get clean, normalized, partitioned PyTorch DataLoaders ready for ML training, with all project infrastructure in place
-**Depends on**: Nothing (first phase)
-**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, INFR-01, INFR-02
-**Success Criteria** (what must be TRUE):
-  1. Running the data pipeline on CICIDS2017 CSVs produces DataLoaders with zero Inf/NaN values and no identifier columns (IP, port, flow ID, timestamp)
-  2. Features are reduced from 78+ raw columns to 20-40 informative ones, normalized with a StandardScaler fitted only on training data
-  3. Data is partitioned IID across a configurable number of clients (2-5) with stratified splits that preserve class ratios, verified by printing class distributions per partition
-  4. A YAML configuration file controls all hyperparameters (learning rate, epochs, batch size, FL rounds, number of clients) and fixed random seeds ensure reproducible outputs
-  5. The project has a working pyproject.toml with pinned dependencies, and `pip install -e .` succeeds
-**Plans:** 3 plans
-
-Plans:
-- [x] 01-01-PLAN.md — Project scaffold, config system, seed utility, device detection
-- [x] 01-02-PLAN.md — Data loading, cleaning, feature selection, normalization, class weights
-- [x] 01-03-PLAN.md — IID partitioning, DataLoaders, pipeline entry point, README
-
-### Phase 2: Model Definition and Local Training
-**Goal**: Users can train an MLP model on a single client's data partition and see it achieve reasonable DDoS detection metrics, confirming the model architecture and training loop work before federation
-**Depends on**: Phase 1
-**Requirements**: MODL-01, MODL-02, MODL-03, DATA-04
-**Success Criteria** (what must be TRUE):
-  1. An MLP model (3 hidden layers, ReLU, dropout, binary output) is defined in a single model.py file and can be instantiated with configurable layer sizes
-  2. Running local training on one client's data partition produces per-epoch metrics (loss, accuracy, F1) printed to console, with F1 above 0.80 on DDoS detection within 5 epochs
-  3. Class-weighted cross-entropy loss is applied so that the model does not simply predict "benign" for everything (attack-class recall is above 0.70)
-  4. The best model checkpoint is saved based on F1-score and can be reloaded for evaluation
-**Plans:** 2 plans
-
-Plans:
-- [x] 02-01-PLAN.md — MLP model definition (nn.Module) with configurable architecture and unit tests
-- [x] 02-02-PLAN.md — Training loop, evaluation, checkpointing, standalone entry point, and tests
-
-### Phase 3: Federated Learning Infrastructure
-**Goal**: Users can run a pure-Python FedAvg federated training loop with multiple virtual clients, per-round metrics logged to console, and global model convergence demonstrated
-**Depends on**: Phase 1, Phase 2
-**Requirements**: FLRN-01, FLRN-02, FLRN-03, EVAL-01
-**Success Criteria** (what must be TRUE):
-  1. A Flower server starts and accepts connections from 2-5 client instances running simultaneously on a single machine
-  2. Clients train locally on their data partitions, send only model weights (no raw data) to the server, and receive aggregated global weights back each round
-  3. FedAvg aggregation completes for a configurable number of rounds (default 10-20), with per-round accuracy, precision, recall, and F1 logged to console
-  4. The global model improves over rounds (F1 in later rounds is higher than F1 in early rounds, demonstrating convergence)
-**Plans:** 2 plans
-
-Plans:
-- [x] 03-01-PLAN.md — FederatedClient class, FedAvg aggregation, server-side evaluation, and unit tests
-- [x] 03-02-PLAN.md — Orchestration loop, CLI entry point, metrics persistence, checkpointing, convergence check
-
-### Phase 4: Evaluation and Visualization
-**Goal**: Users can evaluate the final federated model on held-out test data and generate publication-quality plots that demonstrate the system works
-**Depends on**: Phase 3
-**Requirements**: EVAL-02, EVAL-03, EVAL-04
-**Success Criteria** (what must be TRUE):
-  1. A confusion matrix and full classification report (precision, recall, F1 per class) are generated by evaluating the final global model on a held-out test set that no client trained on
-  2. Convergence plots (loss and F1 over FL rounds) are saved as PNG files showing training progression
-  3. Per-client performance comparison is visualized, showing that all clients contribute meaningfully to the federated model
-  4. TensorBoard logging captures training metrics for real-time monitoring during FL rounds
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 04-01-PLAN.md — Evaluation module: confusion matrix, classification report, convergence plots, per-client comparison, CLI entry point
-- [x] 04-02-PLAN.md — TensorBoard SummaryWriter integration into FL training loop
-
-### Phase 5: Integration and Polish
-**Goal**: Users can run the entire pipeline end-to-end with a single command and understand how to set up, configure, and reproduce the experiment
-**Depends on**: Phase 3, Phase 4
-**Requirements**: MODL-03, INFR-02
-**Success Criteria** (what must be TRUE):
-  1. A shell script or entry point launches the server and N clients, runs federated training, evaluates the global model, and saves all outputs (metrics, plots, checkpoints) to an organized directory structure
-  2. Running the full pipeline from a clean environment (fresh install, data download, training, evaluation) completes without errors and produces all expected outputs
-  3. A README documents setup instructions, data download steps, configuration options, and usage examples sufficient for someone unfamiliar with the project to reproduce results
-**Plans:** 3/3 plans complete
-
-Plans:
-- [x] 05-01-PLAN.md — Pipeline runner module, console script registration, integration test with synthetic data
-- [x] 05-02-PLAN.md — README rewrite as thesis-reproducibility guide, output screenshots
-- [ ] 05-03-PLAN.md — Gap closure: generate example screenshot PNGs for docs/, fix requirements traceability
-
-### Phase 6: Verify Phase 1 Requirements
-**Goal**: Formally verify all Phase 1 requirements by running code paths, validating outputs, and creating VERIFICATION.md to close orphaned requirement gaps
-**Depends on**: Phase 1
-**Requirements**: DATA-01, DATA-02, DATA-03, DATA-05, INFR-01
-**Gap Closure:** Closes gaps from v1.0 audit (8 orphaned requirements — Phase 1 portion)
-**Success Criteria** (what must be TRUE):
-  1. Phase 1 VERIFICATION.md exists with pass/fail results for each requirement
-  2. DATA-01 verified: CSV loading and cleaning produces zero Inf/NaN values
-  3. DATA-02 verified: Feature selection reduces columns to 20-40 range; select_features re-exported from data/__init__.py
-  4. DATA-03 verified: StandardScaler fitted on training data only, no data leakage
-  5. DATA-05 verified: IID partitioning across configurable clients with stratified splits
-  6. INFR-01 verified: YAML config controls all hyperparameters
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] 06-01-PLAN.md — Fix select_features re-export, regression test, and verification script
-- [ ] 06-02-PLAN.md — Produce VERIFICATION.md and update REQUIREMENTS.md traceability
-
-### Phase 7: Verify Phase 4 & Integration Fixes
-**Goal**: Formally verify all Phase 4 requirements and fix standalone_train weighted_loss config inconsistency
-**Depends on**: Phase 4
-**Requirements**: EVAL-02, EVAL-03, EVAL-04
-**Gap Closure:** Closes gaps from v1.0 audit (8 orphaned requirements — Phase 4 portion + integration fixes)
-**Success Criteria** (what must be TRUE):
-  1. Phase 4 VERIFICATION.md exists with pass/fail results for each requirement
-  2. EVAL-02 verified: Confusion matrix and classification report generated on held-out test set
-  3. EVAL-03 verified: Convergence plots saved as PNG files
-  4. EVAL-04 verified: TensorBoard logging captures training metrics
-  5. standalone_train respects weighted_loss config flag (no longer always applies weighted loss)
-**Plans:** 1/2 plans executed
-
-Plans:
-- [ ] 07-01-PLAN.md — Fix weighted_loss bug, regression test, and Phase 4 verification script
-- [ ] 07-02-PLAN.md — Produce VERIFICATION.md and update REQUIREMENTS.md traceability
+</details>
 
 ## Progress
 
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Project Foundation and Data Pipeline | 3/3 | Complete | 2026-03-09 |
-| 2. Model Definition and Local Training | 2/2 | Complete | 2026-03-09 |
-| 3. Federated Learning Infrastructure | 2/2 | Complete | 2026-03-09 |
-| 4. Evaluation and Visualization | 2/2 | Complete   | 2026-03-09 |
-| 5. Integration and Polish | 3/3 | Complete   | 2026-03-10 |
-| 6. Verify Phase 1 Requirements | 2/2 | Complete   | 2026-03-10 |
-| 7. Verify Phase 4 & Integration Fixes | 1/2 | In Progress|  |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Project Foundation & Data Pipeline | v1.0 | 3/3 | Complete | 2026-03-09 |
+| 2. Model Definition & Local Training | v1.0 | 2/2 | Complete | 2026-03-09 |
+| 3. Federated Learning Infrastructure | v1.0 | 2/2 | Complete | 2026-03-09 |
+| 4. Evaluation & Visualization | v1.0 | 2/2 | Complete | 2026-03-09 |
+| 5. Integration & Polish | v1.0 | 3/3 | Complete | 2026-03-10 |
+| 6. Verify Phase 1 Requirements | v1.0 | 2/2 | Complete | 2026-03-10 |
+| 7. Verify Phase 4 & Integration Fixes | v1.0 | 2/2 | Complete | 2026-03-10 |
