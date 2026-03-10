@@ -110,4 +110,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-10 — gap closure phases 6-7 added, 8 orphaned requirements reset to Pending*
+*Last updated: 2026-03-10 — Phase 6 verification complete, DATA-01/02/03/05 and INFR-01 verified via scripts/verify_phase1.py (see 06-VERIFICATION.md)*
