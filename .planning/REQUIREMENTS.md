@@ -30,9 +30,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Evaluation & Visualization
 
 - [x] **EVAL-01**: Log per-round metrics (accuracy, precision, recall, F1) to console
-- [ ] **EVAL-02**: Generate confusion matrix and classification report on held-out test set
-- [ ] **EVAL-03**: Save convergence plots (loss and accuracy over FL rounds) as PNG
-- [ ] **EVAL-04**: Log training metrics to TensorBoard for real-time monitoring
+- [x] **EVAL-02**: Generate confusion matrix and classification report on held-out test set
+- [x] **EVAL-03**: Save convergence plots (loss and accuracy over FL rounds) as PNG
+- [x] **EVAL-04**: Log training metrics to TensorBoard for real-time monitoring
 
 ### Infrastructure
 
@@ -97,9 +97,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FLRN-02 | Phase 3 | Complete |
 | FLRN-03 | Phase 3 | Complete |
 | EVAL-01 | Phase 3 | Complete |
-| EVAL-02 | Phase 4 (impl), Phase 7 (verify) | Pending |
-| EVAL-03 | Phase 4 (impl), Phase 7 (verify) | Pending |
-| EVAL-04 | Phase 4 (impl), Phase 7 (verify) | Pending |
+| EVAL-02 | Phase 4 (impl), Phase 7 (verify) | Complete |
+| EVAL-03 | Phase 4 (impl), Phase 7 (verify) | Complete |
+| EVAL-04 | Phase 4 (impl), Phase 7 (verify) | Complete |
 | INFR-01 | Phase 1 (impl), Phase 6 (verify) | Complete |
 | INFR-02 | Phase 1 (impl), Phase 5 (validated) | Complete |
 
