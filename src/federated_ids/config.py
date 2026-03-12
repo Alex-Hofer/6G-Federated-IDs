@@ -117,6 +117,21 @@ EnvYamlLoader.add_implicit_resolver("!env", _ENV_PATTERN, None)
 EnvYamlLoader.add_constructor("!env", _env_constructor)
 
 
+def _resolve_env_vars(obj: Any) -> Any:
+    """Recursively resolve ``${VAR:-default}`` in all string values."""
+    if isinstance(obj, str):
+        def _replacer(match: re.Match) -> str:
+            var_name = match.group(1)
+            default = match.group(2) if match.group(2) is not None else ""
+            return os.environ.get(var_name, default)
+        return _ENV_PATTERN.sub(_replacer, obj)
+    elif isinstance(obj, dict):
+        return {k: _resolve_env_vars(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_resolve_env_vars(item) for item in obj]
+    return obj
+
+
 def _validate_config(config: dict[str, Any]) -> None:
     """Validate that all required configuration sections and keys are present.
 
@@ -189,5 +204,6 @@ def load_config(path: str) -> dict[str, Any]:
     with open(config_path) as f:
         config = yaml.load(f, Loader=EnvYamlLoader)
 
+    config = _resolve_env_vars(config)
     _validate_config(config)
     return config
