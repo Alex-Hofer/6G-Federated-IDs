@@ -31,6 +31,25 @@ build/
 *.swp
 *.swo
 
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+credentials.json
+secrets.yaml
+secrets.yml
+
+# Claude Code / AI tooling
+.claude/
+.full-review/
+
+# Planning (local dev only)
+.planning/
+
 # OS
 .DS_Store
 Thumbs.db
