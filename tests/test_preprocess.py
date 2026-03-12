@@ -201,8 +201,8 @@ class TestArtifactsSaved:
         result = preprocess(clean_df, config_dict)
 
         assert os.path.isfile(
-            os.path.join(str(tmp_path), "scaler.pkl")
-        ), "scaler.pkl not found"
+            os.path.join(str(tmp_path), "scaler.json")
+        ), "scaler.json not found"
         assert os.path.isfile(
             os.path.join(str(tmp_path), "features.json")
         ), "features.json not found"

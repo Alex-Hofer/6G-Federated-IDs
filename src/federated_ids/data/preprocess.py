@@ -34,7 +34,6 @@ import json
 import logging
 import os
 
-import joblib
 import numpy as np
 import pandas as pd
 import torch
@@ -110,6 +109,92 @@ _DOMAIN_SHORTLIST = [
     "Fwd Header Length",
     "Bwd Header Length",
 ]
+
+
+def _save_scaler_json(scaler: StandardScaler, path: str) -> None:
+    """Save a fitted StandardScaler as a versioned JSON envelope.
+
+    The JSON format avoids arbitrary code execution risks inherent in
+    pickle/joblib serialization.
+
+    Args:
+        scaler: A fitted ``StandardScaler`` instance.
+        path: File path to write the JSON envelope to.
+    """
+    envelope = {
+        "version": "1.0",
+        "type": "StandardScaler",
+        "params": {
+            "mean_": scaler.mean_.tolist(),
+            "scale_": scaler.scale_.tolist(),
+            "var_": scaler.var_.tolist(),
+            "n_features_in_": int(scaler.n_features_in_),
+        },
+    }
+    with open(path, "w") as f:
+        json.dump(envelope, f, indent=2)
+
+
+def _load_scaler_json(path: str) -> StandardScaler:
+    """Load a StandardScaler from a versioned JSON envelope.
+
+    Validates array lengths and finite values before reconstructing
+    the scaler. If only a ``.pkl`` file exists (legacy format), raises
+    ``DataValidationError`` with migration instructions.
+
+    Args:
+        path: File path to the ``scaler.json`` file.
+
+    Returns:
+        A reconstructed ``StandardScaler`` with parameters restored.
+
+    Raises:
+        DataValidationError: If the ``.pkl`` file exists but ``.json``
+            does not, or if array lengths / finite checks fail.
+        FileNotFoundError: If neither file exists.
+    """
+    pkl_path = path.replace(".json", ".pkl")
+
+    if not os.path.isfile(path):
+        if os.path.isfile(pkl_path):
+            raise DataValidationError(
+                "Found legacy scaler.pkl but no scaler.json. "
+                "Run `federated-ids-preprocess` to regenerate scaler in safe JSON format"
+            )
+        raise FileNotFoundError(f"Scaler file not found: {path}")
+
+    with open(path) as f:
+        envelope = json.load(f)
+
+    params = envelope["params"]
+    n_features = params["n_features_in_"]
+
+    # Validate array lengths
+    for key in ("mean_", "scale_", "var_"):
+        arr = params[key]
+        if len(arr) != n_features:
+            raise DataValidationError(
+                f"Scaler {key} has length {len(arr)}, expected {n_features}"
+            )
+
+    # Validate all values are finite
+    for key in ("mean_", "scale_", "var_"):
+        arr = np.array(params[key])
+        if not np.isfinite(arr).all():
+            non_finite = int((~np.isfinite(arr)).sum())
+            raise DataValidationError(
+                f"Scaler {key} contains {non_finite} non-finite values"
+            )
+
+    # Reconstruct scaler
+    scaler = StandardScaler()
+    scaler.mean_ = np.array(params["mean_"])
+    scaler.scale_ = np.array(params["scale_"])
+    scaler.var_ = np.array(params["var_"])
+    scaler.n_features_in_ = n_features
+    scaler.n_samples_seen_ = np.int64(1)  # sentinel value
+
+    return scaler
 
 
 def select_features(
@@ -348,9 +433,9 @@ def preprocess(df: pd.DataFrame, config: dict) -> dict:
     # Step 6: Save artifacts to processed directory
     os.makedirs(processed_dir, exist_ok=True)
 
-    # Save fitted scaler
-    scaler_path = os.path.join(processed_dir, "scaler.pkl")
-    joblib.dump(scaler, scaler_path)
+    # Save fitted scaler as JSON (safe, no arbitrary code execution)
+    scaler_path = os.path.join(processed_dir, "scaler.json")
+    _save_scaler_json(scaler, scaler_path)
     logger.info("Saved scaler to %s", scaler_path)
 
     # Save selected feature names
