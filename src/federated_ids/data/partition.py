@@ -17,6 +17,8 @@ import logging
 
 import numpy as np
 import torch
+
+from federated_ids.exceptions import DataValidationError
 from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -49,7 +51,7 @@ def partition_iid(
         Each partition contains a non-overlapping subset of the training data.
 
     Raises:
-        AssertionError: If any partition's class ratio deviates more than 5%
+        DataValidationError: If any partition's class ratio deviates more than 5%
             from the global ratio.
     """
     skf = StratifiedKFold(n_splits=num_clients, shuffle=True, random_state=seed)
@@ -76,10 +78,11 @@ def partition_iid(
         # Validation gate: class ratio within 5% of global
         part_ratio = np.mean(y_part == 1)
         deviation = abs(part_ratio - global_ratio)
-        assert deviation <= 0.05, (
-            f"VALIDATION FAILED: Client {fold_idx} class-1 ratio {part_ratio:.3f} "
-            f"deviates {deviation:.3f} from global {global_ratio:.3f} (max 0.05)"
-        )
+        if deviation > 0.05:
+            raise DataValidationError(
+                f"Client {fold_idx} class-1 ratio {part_ratio:.3f} "
+                f"deviates {deviation:.3f} from global {global_ratio:.3f} (max 0.05)"
+            )
 
         partitions.append((X_part, y_part))
 

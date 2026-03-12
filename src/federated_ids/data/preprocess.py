@@ -43,6 +43,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
 from federated_ids.config import load_config
+from federated_ids.exceptions import DataValidationError
 from federated_ids.data.loader import IDENTIFIER_COLS, load_cicids2017
 from federated_ids.data.partition import create_dataloaders, partition_iid
 from federated_ids.device import get_device
@@ -377,24 +378,35 @@ def preprocess(df: pd.DataFrame, config: dict) -> dict:
     logger.info("Saved class distribution to %s", stats_path)
 
     # --- VALIDATION GATES ---
-    assert not np.isnan(X_train).any(), (
-        "VALIDATION FAILED: NaN values in X_train after scaling"
-    )
-    assert not np.isnan(X_test).any(), (
-        "VALIDATION FAILED: NaN values in X_test after scaling"
-    )
-    assert not np.isinf(X_train).any(), (
-        "VALIDATION FAILED: Inf values in X_train after scaling"
-    )
-    assert not np.isinf(X_test).any(), (
-        "VALIDATION FAILED: Inf values in X_test after scaling"
-    )
-    assert X_train.dtype == np.float32, (
-        f"VALIDATION FAILED: X_train dtype is {X_train.dtype}, expected float32"
-    )
-    assert X_test.dtype == np.float32, (
-        f"VALIDATION FAILED: X_test dtype is {X_test.dtype}, expected float32"
-    )
+    # Using if/raise instead of assert so they cannot be disabled by python -O.
+    if np.isnan(X_train).any():
+        nan_count = int(np.isnan(X_train).sum())
+        raise DataValidationError(
+            f"NaN values in X_train after scaling: found {nan_count} NaN values"
+        )
+    if np.isnan(X_test).any():
+        nan_count = int(np.isnan(X_test).sum())
+        raise DataValidationError(
+            f"NaN values in X_test after scaling: found {nan_count} NaN values"
+        )
+    if np.isinf(X_train).any():
+        inf_count = int(np.isinf(X_train).sum())
+        raise DataValidationError(
+            f"Inf values in X_train after scaling: found {inf_count} Inf values"
+        )
+    if np.isinf(X_test).any():
+        inf_count = int(np.isinf(X_test).sum())
+        raise DataValidationError(
+            f"Inf values in X_test after scaling: found {inf_count} Inf values"
+        )
+    if X_train.dtype != np.float32:
+        raise DataValidationError(
+            f"X_train dtype is {X_train.dtype}, expected float32"
+        )
+    if X_test.dtype != np.float32:
+        raise DataValidationError(
+            f"X_test dtype is {X_test.dtype}, expected float32"
+        )
 
     logger.info(
         "Preprocessing complete. Features: %d, Train: %d, Test: %d",

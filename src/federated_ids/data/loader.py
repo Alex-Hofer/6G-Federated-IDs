@@ -20,6 +20,8 @@ import os
 import numpy as np
 import pandas as pd
 
+from federated_ids.exceptions import DataValidationError
+
 logger = logging.getLogger(__name__)
 
 # DDoS attack label variants found in CICIDS2017 dataset.
@@ -67,7 +69,7 @@ def load_cicids2017(data_dir: str, files: list[str]) -> pd.DataFrame:
 
     Raises:
         FileNotFoundError: If any specified CSV file does not exist.
-        AssertionError: If validation gates fail (Inf/NaN remain or
+        DataValidationError: If validation gates fail (Inf/NaN remain or
             labels are not binary).
     """
     dfs = []
@@ -117,21 +119,26 @@ def load_cicids2017(data_dir: str, files: list[str]) -> pd.DataFrame:
         logger.info("  Class %d: %d rows (%.1f%%)", label, count, pct)
 
     # --- VALIDATION GATES ---
-    # These assertions catch silent data corruption early.
+    # These checks catch silent data corruption early.
+    # Using if/raise instead of assert so they cannot be disabled by python -O.
     numeric_df = combined.select_dtypes(include=[np.number])
-    assert not np.isinf(
-        numeric_df.values
-    ).any(), "VALIDATION FAILED: Inf values remain after cleaning"
+    if np.isinf(numeric_df.values).any():
+        inf_count = int(np.isinf(numeric_df.values).sum())
+        raise DataValidationError(
+            f"Inf values remain after cleaning: found {inf_count} Inf values in numeric columns"
+        )
 
-    assert (
-        not combined.isna().any().any()
-    ), "VALIDATION FAILED: NaN values remain after cleaning"
+    if combined.isna().any().any():
+        nan_count = int(combined.isna().sum().sum())
+        raise DataValidationError(
+            f"NaN values remain after cleaning: found {nan_count} NaN values"
+        )
 
     unique_labels = set(combined["Label"].unique())
-    assert unique_labels == {
-        0,
-        1,
-    }, f"VALIDATION FAILED: Labels are {unique_labels}, expected {{0, 1}}"
+    if unique_labels != {0, 1}:
+        raise DataValidationError(
+            f"Expected labels {{0, 1}}, got {unique_labels}"
+        )
 
     logger.info(
         "Validation passed: no Inf, no NaN, binary labels {0, 1}. "
