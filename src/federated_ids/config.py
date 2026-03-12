@@ -31,6 +31,9 @@ _REQUIRED_SECTIONS = {
     "seed": int,
 }
 
+# Valid values for the log_level configuration key
+_VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+
 # Required nested keys per section
 _REQUIRED_NESTED = {
     "data": ["raw_dir", "processed_dir", "files", "test_size"],
@@ -61,6 +64,44 @@ def _env_constructor(loader: yaml.Loader, node: yaml.Node) -> str:
         return os.environ.get(var_name, default)
 
     return _ENV_PATTERN.sub(_replacer, value)
+
+
+def validate_log_level(level: str) -> str:
+    """Validate that a log level string is one of the standard Python levels.
+
+    Args:
+        level: Log level name (e.g. ``"INFO"``, ``"DEBUG"``).
+
+    Returns:
+        The validated log level string (unchanged).
+
+    Raises:
+        ValueError: If ``level`` is not a valid Python log level.
+    """
+    if level not in _VALID_LOG_LEVELS:
+        raise ValueError(
+            f"Invalid log_level '{level}'. Must be one of: {sorted(_VALID_LOG_LEVELS)}"
+        )
+    return level
+
+
+def validate_config_path(path: str) -> str:
+    """Validate that a configuration file path has a YAML extension.
+
+    Args:
+        path: Path to the configuration file.
+
+    Returns:
+        The validated path string (unchanged).
+
+    Raises:
+        ValueError: If ``path`` does not end with ``.yaml`` or ``.yml``.
+    """
+    if not path.endswith((".yaml", ".yml")):
+        raise ValueError(
+            f"Config path '{path}' must have .yaml or .yml extension"
+        )
+    return path
 
 
 # Custom YAML loader that supports env var interpolation.
@@ -106,6 +147,13 @@ def _validate_config(config: dict[str, Any]) -> None:
                 if key not in config[section]:
                     errors.append(f"Missing required key: '{section}.{key}'")
 
+    # Validate log_level if present
+    if "log_level" in config:
+        try:
+            validate_log_level(config["log_level"])
+        except ValueError as e:
+            errors.append(str(e))
+
     if errors:
         error_list = "\n  - ".join(errors)
         raise ValueError(f"Configuration validation failed:\n  - {error_list}")
@@ -133,6 +181,7 @@ def load_config(path: str) -> dict[str, Any]:
         >>> config["data"]["test_size"]
         0.2
     """
+    validate_config_path(path)
     config_path = Path(path)
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {path}")
