@@ -43,7 +43,12 @@ Full details: milestones/v1.0-ROADMAP.md
   3. `pyproject.toml` declares exactly the dependencies the project uses — no unused deps listed, no implicit deps missing; scaler serialization uses safe JSON format instead of pickle
   4. Config inputs (`log_level`, `config_path`) are validated before use; config dict is never mutated with side-effect keys like `_device`
   5. Tests verify that validation gates catch invalid inputs (assert-bypass scenarios) and that fedavg edge cases produce correct errors
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Exception infrastructure, assert replacements, scaler JSON migration
+- [ ] 08-02-PLAN.md — FedAvg validation, config hardening, dependency cleanup
+- [ ] 08-03-PLAN.md — Security validation tests
 
 ### Phase 9: Refactoring & Architecture
 **Goal**: Duplicated patterns are consolidated and the codebase has a single, typed configuration source
@@ -94,7 +99,7 @@ Full details: milestones/v1.0-ROADMAP.md
 | 5. Integration & Polish | v1.0 | 3/3 | Complete | 2026-03-10 |
 | 6. Verify Phase 1 Requirements | v1.0 | 2/2 | Complete | 2026-03-10 |
 | 7. Verify Phase 4 & Integration Fixes | v1.0 | 2/2 | Complete | 2026-03-10 |
-| 8. Security & Integrity | v1.1 | 0/TBD | Not started | - |
+| 8. Security & Integrity | v1.1 | 0/3 | Not started | - |
 | 9. Refactoring & Architecture | v1.1 | 0/TBD | Not started | - |
 | 10. Quality & Hygiene | v1.1 | 0/TBD | Not started | - |
 | 11. Final Infrastructure | v1.1 | 0/TBD | Not started | - |
