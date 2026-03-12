@@ -25,7 +25,15 @@ Detect DDoS attacks across a federated network of edge nodes without any client 
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+<!-- v1.1 Code Hardening & Security — fix all 73 findings from .full-review/ -->
+
+- [ ] Replace assert-based validation with proper error handling
+- [ ] Fix dependency declarations (remove unused, declare implicit)
+- [ ] Add input validation to fedavg_aggregate
+- [ ] Extract duplicated patterns (criterion factory, tensor loading)
+- [ ] Introduce typed configuration
+- [ ] Centralize logging, modernize PyTorch/NumPy patterns
+- [ ] Add LICENSE, CI pipeline, remote preparation
 
 ### Out of Scope
 
@@ -41,6 +49,7 @@ Detect DDoS attacks across a federated network of edge nodes without any client 
 ## Context
 
 **Current state:** v1.0 shipped (2026-03-10). 36 Python files, 6,643 LOC. 104 commits. All 17 v1 requirements verified.
+**v1.1 context:** Full code review completed (2026-03-12) identifying 73 findings across security, architecture, quality, and infrastructure. See `.full-review/05-final-report.md` for consolidated findings.
 
 - **Dataset:** CICIDS2017 — well-labeled benchmark with DDoS flows, widely used in IDS research
 - **Framework:** Flower (flwr) for FL client-server communication and FedAvg aggregation
@@ -72,5 +81,15 @@ Detect DDoS attacks across a federated network of edge nodes without any client 
 | F1-based checkpointing (not loss) | Better DDoS detection quality metric for imbalanced classes | Good — saves best detector, not lowest loss |
 | TDD for bug fixes (Phases 6-7) | Write failing test first, then fix, ensures regression coverage | Good — caught weighted_loss bug cleanly |
 
+## Current Milestone: v1.1 Code Hardening & Security
+
+**Goal:** Resolve all 73 findings from comprehensive code review to achieve zero technical debt.
+
+**Target features:**
+- Phase 8: Security & Integrity — assert replacement, validation gates, pyproject.toml fixes
+- Phase 9: Refactoring & Architecture — deduplication, criterion factory, tensor loading, typed config
+- Phase 10: Quality & Hygiene — unused code, logging, modernize patterns, expand tests
+- Phase 11: Final Infrastructure — LICENSE, CI pipeline, remote preparation
+
 ---
-*Last updated: 2026-03-10 after v1.0 milestone*
+*Last updated: 2026-03-12 after v1.1 milestone start*
