@@ -9,13 +9,13 @@
 ### Security & Integrity
 
 - [x] **SEC-01**: Replace all `assert`-based validation with `if/raise ValueError` in loader.py, preprocess.py, partition.py
-- [ ] **SEC-02**: Add input validation to `fedavg_aggregate` (empty results, zero examples, NaN params)
+- [x] **SEC-02**: Add input validation to `fedavg_aggregate` (empty results, zero examples, NaN params)
 - [x] **SEC-03**: Replace joblib pickle serialization of scaler with safe JSON format
-- [ ] **SEC-04**: Remove unused `flwr` and `tqdm` from pyproject.toml dependencies
+- [x] **SEC-04**: Remove unused `flwr` and `tqdm` from pyproject.toml dependencies
 - [x] **SEC-05**: Declare `joblib` as explicit dependency in pyproject.toml
-- [ ] **SEC-06**: Validate `log_level` config and `config_path` inputs before use
-- [ ] **SEC-07**: Eliminate config dict mutation side effects (`config["_device"]`)
-- [ ] **SEC-08**: Fix Flower dependency contradiction in `fl/__init__.py` docstring; add env var interpolation allowlist
+- [x] **SEC-06**: Validate `log_level` config and `config_path` inputs before use
+- [x] **SEC-07**: Eliminate config dict mutation side effects (`config["_device"]`)
+- [x] **SEC-08**: Fix Flower dependency contradiction in `fl/__init__.py` docstring; add env var interpolation allowlist
 - [ ] **SEC-09**: Add tests for validation gates (assert bypass scenario) and fedavg edge cases
 
 ### Refactoring & Architecture
@@ -79,13 +79,13 @@ None — v1.1 is scoped to resolve all existing findings. New features deferred 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SEC-01 | Phase 8 | Complete |
-| SEC-02 | Phase 8 | Pending |
+| SEC-02 | Phase 8 | Complete |
 | SEC-03 | Phase 8 | Complete |
-| SEC-04 | Phase 8 | Pending |
+| SEC-04 | Phase 8 | Complete |
 | SEC-05 | Phase 8 | Complete |
-| SEC-06 | Phase 8 | Pending |
-| SEC-07 | Phase 8 | Pending |
-| SEC-08 | Phase 8 | Pending |
+| SEC-06 | Phase 8 | Complete |
+| SEC-07 | Phase 8 | Complete |
+| SEC-08 | Phase 8 | Complete |
 | SEC-09 | Phase 8 | Pending |
 | REFAC-01 | Phase 9 | Pending |
 | REFAC-02 | Phase 9 | Pending |
