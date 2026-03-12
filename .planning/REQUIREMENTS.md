@@ -16,7 +16,7 @@
 - [x] **SEC-06**: Validate `log_level` config and `config_path` inputs before use
 - [x] **SEC-07**: Eliminate config dict mutation side effects (`config["_device"]`)
 - [x] **SEC-08**: Fix Flower dependency contradiction in `fl/__init__.py` docstring; add env var interpolation allowlist
-- [ ] **SEC-09**: Add tests for validation gates (assert bypass scenario) and fedavg edge cases
+- [x] **SEC-09**: Add tests for validation gates (assert bypass scenario) and fedavg edge cases
 
 ### Refactoring & Architecture
 
@@ -86,7 +86,7 @@ None — v1.1 is scoped to resolve all existing findings. New features deferred 
 | SEC-06 | Phase 8 | Complete |
 | SEC-07 | Phase 8 | Complete |
 | SEC-08 | Phase 8 | Complete |
-| SEC-09 | Phase 8 | Pending |
+| SEC-09 | Phase 8 | Complete |
 | REFAC-01 | Phase 9 | Pending |
 | REFAC-02 | Phase 9 | Pending |
 | REFAC-03 | Phase 9 | Pending |
