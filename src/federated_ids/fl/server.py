@@ -31,6 +31,7 @@ from statistics import mean
 import numpy as np
 import torch
 
+from federated_ids.exceptions import DataValidationError
 from federated_ids.model.train import evaluate
 
 try:
@@ -52,6 +53,9 @@ def fedavg_aggregate(
     ``aggregated[i] = sum(params_i * n_i / total_n)`` where ``n_i`` is the
     number of training examples on client ``i``.
 
+    Validation gates filter out invalid clients (zero examples, NaN parameters)
+    with warnings. Raises if no valid clients remain.
+
     Args:
         results: List of ``(parameters, num_examples)`` tuples, one per
             client.  ``parameters`` is a list of NumPy arrays (one per
@@ -60,21 +64,50 @@ def fedavg_aggregate(
 
     Returns:
         List of NumPy arrays containing the weighted-average parameters.
+
+    Raises:
+        DataValidationError: If ``results`` is empty or all clients are
+            filtered out during validation.
     """
-    total_examples = sum(n for _, n in results)
-    num_layers = len(results[0][0])
+    # Gate 1: Empty results
+    if not results:
+        raise DataValidationError(
+            "fedavg_aggregate received empty results -- no clients participated"
+        )
+
+    # Gate 2: Filter zero-example and NaN-parameter clients
+    valid_results = []
+    for i, (params, n_examples) in enumerate(results):
+        if n_examples <= 0:
+            logger.warning("Client %d has %d examples, skipping", i, n_examples)
+            continue
+        if any(np.isnan(p).any() for p in params):
+            logger.warning("Client %d submitted NaN parameters, skipping", i)
+            continue
+        valid_results.append((params, n_examples))
+
+    # Gate 3: All clients filtered out
+    if not valid_results:
+        raise DataValidationError(
+            f"All clients filtered out -- no valid results for aggregation "
+            f"(started with {len(results)} clients)"
+        )
+
+    total_examples = sum(n for _, n in valid_results)
+    num_layers = len(valid_results[0][0])
 
     # Initialize accumulator with zeros matching parameter shapes
-    aggregated = [np.zeros_like(results[0][0][i]) for i in range(num_layers)]
+    aggregated = [np.zeros_like(valid_results[0][0][i]) for i in range(num_layers)]
 
-    for params, num_examples in results:
+    for params, num_examples in valid_results:
         weight = num_examples / total_examples
         for i in range(num_layers):
             aggregated[i] += params[i] * weight
 
     logger.info(
-        "FedAvg aggregation: %d clients, %d total examples",
+        "FedAvg aggregation: %d clients (%d valid), %d total examples",
         len(results),
+        len(valid_results),
         total_examples,
     )
 
@@ -199,6 +232,7 @@ def save_fl_metrics(
     history: list[dict],
     config: dict,
     output_path: str,
+    device: str = "cpu",
 ) -> None:
     """Persist per-round FL metrics and embedded config to a JSON file.
 
@@ -206,6 +240,7 @@ def save_fl_metrics(
         history: List of per-round metric dicts.
         config: Full configuration dictionary (relevant keys are extracted).
         output_path: Path to the output JSON file.
+        device: Compute device string (e.g. ``"cpu"``, ``"cuda:0"``).
     """
     fed = config.get("federation", {})
     trn = config.get("training", {})
@@ -221,7 +256,7 @@ def save_fl_metrics(
             "hidden_layers": mdl.get("hidden_layers"),
             "strategy": "FedAvg",
             "fraction_fit": fed.get("fraction_fit"),
-            "device": str(config.get("_device", "cpu")),
+            "device": device,
             "seed": config.get("seed", 42),
         },
         "rounds": [
@@ -458,10 +493,8 @@ def run_federated_training(
         _print_fl_summary_table(history)
         check_convergence(history)
 
-        # Store device in config for metrics persistence
-        config["_device"] = str(device)
         metrics_path = os.path.join(output_dir, "metrics", "fl_metrics.json")
-        save_fl_metrics(history, config, metrics_path)
+        save_fl_metrics(history, config, metrics_path, device=str(device))
         logger.info("FL metrics saved to %s", metrics_path)
     finally:
         if writer is not None:
