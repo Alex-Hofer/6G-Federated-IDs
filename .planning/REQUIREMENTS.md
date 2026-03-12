@@ -8,11 +8,11 @@
 
 ### Security & Integrity
 
-- [ ] **SEC-01**: Replace all `assert`-based validation with `if/raise ValueError` in loader.py, preprocess.py, partition.py
+- [x] **SEC-01**: Replace all `assert`-based validation with `if/raise ValueError` in loader.py, preprocess.py, partition.py
 - [ ] **SEC-02**: Add input validation to `fedavg_aggregate` (empty results, zero examples, NaN params)
-- [ ] **SEC-03**: Replace joblib pickle serialization of scaler with safe JSON format
+- [x] **SEC-03**: Replace joblib pickle serialization of scaler with safe JSON format
 - [ ] **SEC-04**: Remove unused `flwr` and `tqdm` from pyproject.toml dependencies
-- [ ] **SEC-05**: Declare `joblib` as explicit dependency in pyproject.toml
+- [x] **SEC-05**: Declare `joblib` as explicit dependency in pyproject.toml
 - [ ] **SEC-06**: Validate `log_level` config and `config_path` inputs before use
 - [ ] **SEC-07**: Eliminate config dict mutation side effects (`config["_device"]`)
 - [ ] **SEC-08**: Fix Flower dependency contradiction in `fl/__init__.py` docstring; add env var interpolation allowlist
@@ -78,11 +78,11 @@ None — v1.1 is scoped to resolve all existing findings. New features deferred 
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 8 | Pending |
+| SEC-01 | Phase 8 | Complete |
 | SEC-02 | Phase 8 | Pending |
-| SEC-03 | Phase 8 | Pending |
+| SEC-03 | Phase 8 | Complete |
 | SEC-04 | Phase 8 | Pending |
-| SEC-05 | Phase 8 | Pending |
+| SEC-05 | Phase 8 | Complete |
 | SEC-06 | Phase 8 | Pending |
 | SEC-07 | Phase 8 | Pending |
 | SEC-08 | Phase 8 | Pending |
